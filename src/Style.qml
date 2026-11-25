@@ -58,39 +58,41 @@ Item {
 
     // === COLORS ===
     readonly property color mainBackgroundColor: "#ffffff"
-    readonly property color raspberryRed: "#ab1e3a"
+    // vBase Imager: the upstream accent name is kept (it is used everywhere);
+    // its value is the Unicron primary.
+    readonly property color raspberryRed: primaryColor
     readonly property color transparent: "transparent"
 
     readonly property color buttonBackgroundColor: mainBackgroundColor
     readonly property color buttonForegroundColor: raspberryRed
-    readonly property color buttonFocusedBackgroundColor: "#d1dcfb"
-    readonly property color buttonHoveredBackgroundColor: "#f2f2f2"
+    readonly property color buttonFocusedBackgroundColor: accentColor
+    readonly property color buttonHoveredBackgroundColor: backgroundSubtleColor
 
     readonly property color button2BackgroundColor: raspberryRed
     readonly property color button2ForegroundColor: mainBackgroundColor
     // Focused: noticeably darker for strong state indication (keyboard focus)
-    readonly property color button2FocusedBackgroundColor: "#8f122c"
+    readonly property color button2FocusedBackgroundColor: "#2f4a0d"
     // Hovered: noticeably lighter to differentiate from base (≥4.5:1 contrast vs base)
-    readonly property color button2HoveredBackgroundColor: "#eac7ce"
+    readonly property color button2HoveredBackgroundColor: accentColor
     // Hovered foreground should be Raspberry Red for ≥4.5:1 contrast on the light hover bg
     readonly property color button2HoveredForegroundColor: raspberryRed
-    readonly property color raspberryRedHighlight: "#d64561"
+    readonly property color raspberryRedHighlight: successColor
 
-    readonly property color titleBackgroundColor: "#f5f5f5"
-    readonly property color titleSeparatorColor: "#afafaf"
-    readonly property color popupBorderColor: "#dcdcdc"
+    readonly property color titleBackgroundColor: backgroundSubtleColor
+    readonly property color titleSeparatorColor: controlBorderColor
+    readonly property color popupBorderColor: borderColor
 
     readonly property color listViewRowBackgroundColor: "#ffffff"
     readonly property color listViewHoverRowBackgroundColor: titleBackgroundColor
     // Selection highlight color for OS/device lists
-    readonly property color listViewHighlightColor: "#BACCE7"
+    readonly property color listViewHighlightColor: accentColor
 
     // Utility translucent colors
     readonly property color translucentWhite10: Qt.rgba(255, 255, 255, 0.1)
     readonly property color translucentWhite30: Qt.rgba(255, 255, 255, 0.3)
 
     // descriptions in list views
-    readonly property color textDescriptionColor: "#1a1a1a"
+    readonly property color textDescriptionColor: foregroundSecondaryColor
     // Sidebar colors
     readonly property color sidebarActiveBackgroundColor: raspberryRed
     readonly property color sidebarTextOnActiveColor: "#FFFFFF"
@@ -102,13 +104,13 @@ Item {
     readonly property color sidebarBorderColour: raspberryRed
 
     // OS metadata
-    readonly property color textMetadataColor: "#646464"
+    readonly property color textMetadataColor: mutedForegroundColor
 
     // for the "device / OS / storage" titles
     readonly property color subtitleColor: "#ffffff"
 
     readonly property color progressBarTextColor: "white"
-    readonly property color progressBarVerifyForegroundColor: "#6cc04a"
+    readonly property color progressBarVerifyForegroundColor: successColor
     readonly property color progressBarBackgroundColor: raspberryRed
     // New: distinct colors for writing vs verification phases
     readonly property color progressBarWritingForegroundColor: raspberryRed
@@ -117,24 +119,26 @@ Item {
     readonly property color lanbarBackgroundColor: "#ffffe3"
 
     /// the check-boxes/radio-buttons have labels that might be disabled
-    readonly property color formLabelColor: "black"
-    readonly property color formLabelErrorColor: "red"
-    readonly property color formLabelDisabledColor: "grey"
+    readonly property color formLabelColor: foregroundColor
+    readonly property color formLabelErrorColor: dangerColor
+    readonly property color formLabelDisabledColor: "#8a958c"
     // Active color for radio buttons, checkboxes, and switches
-    readonly property color formControlActiveColor: "#1955AE"
+    readonly property color formControlActiveColor: primaryColor
 
     readonly property color embeddedModeInfoTextColor: "#ffffff"
 
     // Focus/outline
-    readonly property color focusOutlineColor: "#0078d4"
+    readonly property color focusOutlineColor: primaryColor
     readonly property int focusOutlineWidth: 2
     readonly property int focusOutlineRadius: 4
     readonly property int focusOutlineMargin: -4
 
     // === FONTS ===
-    readonly property alias fontFamily: roboto.name
-    readonly property alias fontFamilyLight: robotoLight.name
-    readonly property alias fontFamilyBold: robotoBold.name
+    // vBase Imager: Manrope (SIL OFL 1.1, fonts/Manrope-OFL.txt), one variable
+    // font for every weight; Roboto stays as the fallback if it fails to load.
+    readonly property string fontFamily: manrope.status === FontLoader.Ready ? manrope.name : roboto.name
+    readonly property string fontFamilyLight: manrope.status === FontLoader.Ready ? manrope.name : robotoLight.name
+    readonly property string fontFamilyBold: manrope.status === FontLoader.Ready ? manrope.name : robotoBold.name
 
     // Font sizes (point sizes — DPI-aware, scaled by Qt based on screen logical DPI)
     // Additionally scaled by the OS accessibility text-scaling factor.
@@ -209,6 +213,7 @@ Item {
     readonly property int stepContentSpacing: scaled(16)
 
     // Font loaders
+    FontLoader { id: manrope;     source: "fonts/Manrope-Variable.ttf" }
     FontLoader { id: roboto;      source: "fonts/Roboto-Regular.ttf" }
     FontLoader { id: robotoLight; source: "fonts/Roboto-Light.ttf" }
     FontLoader { id: robotoBold;  source: "fonts/Roboto-Bold.ttf" }

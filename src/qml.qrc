@@ -13,6 +13,7 @@
 
     <!-- Resources used by QML: -->
     <qresource prefix="/qt/qml/RpiImager">
+        <file>fonts/Manrope-Variable.ttf</file>
         <file>fonts/Roboto-Bold.ttf</file>
         <file>fonts/Roboto-Light.ttf</file>
         <file>fonts/Roboto-Regular.ttf</file>

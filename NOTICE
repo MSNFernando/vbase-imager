@@ -1,0 +1,22 @@
+vBase Imager
+Copyright 2026 the vBase authors
+
+This product is a modified version of rpi-imager
+(https://github.com/raspberrypi/rpi-imager), Copyright (C) 2020-2025
+Raspberry Pi Ltd, licensed under the Apache License, Version 2.0
+(see license.txt).
+
+Modifications made for vBase Imager include: the image list is limited to
+vBase installer releases, download telemetry and Raspberry Pi online
+services are disabled, the wizard is reduced to Release / USB stick / Write,
+and the name, icons, colours and fonts are changed. Files that were changed
+carry the upstream copyright notice and are modified by the vBase authors.
+
+vBase Imager is not affiliated with, sponsored by or endorsed by Raspberry
+Pi Ltd. "Raspberry Pi" is a trademark of Raspberry Pi Ltd and is used here
+only to identify the upstream project.
+
+Third-party components keep their own licences, including:
+- Manrope font (src/fonts/Manrope-Variable.ttf), Copyright 2018 The Manrope
+  Project Authors, SIL Open Font License 1.1 (src/fonts/Manrope-OFL.txt).
+- The libraries listed under src/dependencies/.

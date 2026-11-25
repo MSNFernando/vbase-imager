@@ -4,12 +4,12 @@
  "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
 <policyconfig>
 
-  <vendor>Raspberry Pi Ltd</vendor>
-  <vendor_url>https://www.raspberrypi.com/</vendor_url>
+  <vendor>vBase</vendor>
+  <vendor_url>https://github.com/MSNFernando/vbase-imager</vendor_url>
 
   <action id="com.raspberrypi.rpi-imager.run">
-    <description>Run Raspberry Pi Imager</description>
-    <message>Authentication is required to run Raspberry Pi Imager</message>
+    <description>Run vBase Imager</description>
+    <message>Authentication is required to run vBase Imager</message>
     <icon_name>rpi-imager</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>

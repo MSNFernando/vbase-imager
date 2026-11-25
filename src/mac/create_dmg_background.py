@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to create a stylized background image for the Raspberry Pi Imager DMG.
+Script to create a stylized background image for the vBase Imager DMG.
 This creates a background that guides users to drag the app to Applications.
 """
 
@@ -76,9 +76,9 @@ def create_dmg_background(output_path="dmg_background.png", version_str="", widt
     
     # Draw title with version if provided
     if version_str:
-        title_text = f"Raspberry Pi Imager {version_str}"
+        title_text = f"vBase Imager {version_str}"
     else:
-        title_text = "Raspberry Pi Imager"
+        title_text = "vBase Imager"
 
     # Shrink the title to fit the window width — a long version string
     # (e.g. "v2.0.9-45-g3f3f306f-dirty") would otherwise overflow both edges.

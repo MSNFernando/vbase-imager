@@ -175,9 +175,9 @@ BaseDialog {
             ImOptionButton {
                 id: editRepoButton
                 objectName: "editRepoButton"
-                text: qsTr("Content Repository")
+                text: qsTr("Release list")
                 btnText: qsTr("Edit")
-                accessibleDescription: qsTr("Change the source of operating system images between official Raspberry Pi repository and custom sources")
+                accessibleDescription: qsTr("Change where the list of vBase releases comes from")
                 Layout.fillWidth: true
                 // Disable while write is in progress to prevent changing source during write
                 enabled: ImageWriterSingleton.writeState === ImageWriterSingleton.Idle ||
@@ -285,7 +285,7 @@ BaseDialog {
                 id: chkTelemetry
                 objectName: "telemetryToggle"
                 text: qsTr("Enable anonymous statistics (telemetry)")
-                accessibleDescription: qsTr("Send anonymous usage statistics to help improve Raspberry Pi Imager")
+                accessibleDescription: qsTr("Send anonymous usage statistics to help improve vBase Imager")
                 helpLabel: ImageWriterSingleton.isEmbeddedMode() ? "" : qsTr("What is this?")
                 helpUrl: ImageWriterSingleton.isEmbeddedMode() ? "" : "https://github.com/raspberrypi/rpi-imager?tab=readme-ov-file#anonymous-metrics-telemetry"
                 // vBase Imager: telemetry is compiled out.
@@ -310,6 +310,25 @@ BaseDialog {
         horizontalAlignment: Text.AlignHCenter
         visible: !ImageWriterSingleton.hasWindowDecorations()
         Layout.bottomMargin: Style.spacingSmall
+    }
+
+    // vBase Imager: About / attribution (Apache-2.0, see NOTICE)
+    Text {
+        id: aboutText
+        objectName: "vbaseAboutText"
+        textFormat: Text.PlainText
+        text: qsTr("vBase Imager %1. A modified fork of the open-source rpi-imager project by Raspberry Pi Ltd, used under the Apache License 2.0. Not affiliated with or endorsed by Raspberry Pi Ltd. Manrope font: SIL Open Font License 1.1.").arg(ImageWriterSingleton.constantVersion())
+        font.pointSize: Style.fontSizeCaption
+        font.family: Style.fontFamily
+        color: Style.textMetadataColor
+        wrapMode: Text.WordWrap
+        Layout.fillWidth: true
+        Layout.leftMargin: Style.cardPadding
+        Layout.rightMargin: Style.cardPadding
+        Layout.bottomMargin: Style.spacingSmall
+        horizontalAlignment: Text.AlignHCenter
+        Accessible.role: Accessible.StaticText
+        Accessible.name: text
     }
 
     // Buttons section with background
@@ -346,7 +365,7 @@ BaseDialog {
                 id: saveButton
                 objectName: "optionsSaveButton"
                 text: qsTr("Save")
-                accessibleDescription: qsTr("Save the selected options and apply them to Raspberry Pi Imager")
+                accessibleDescription: qsTr("Save the selected options and apply them to vBase Imager")
                 Layout.minimumWidth: Style.buttonWidthMinimum
                 activeFocusOnTab: true
                 onClicked: {
@@ -512,7 +531,7 @@ BaseDialog {
             font.family: Style.fontFamily
             color: Style.textDescriptionColor
             Layout.fillWidth: true
-            text: qsTr("If you disable warnings, Raspberry Pi Imager will <b>not show confirmation prompts before writing images</b>. You will still be required to <b>type the exact name</b> when selecting a system drive.")
+            text: qsTr("If you disable warnings, vBase Imager will <b>not show confirmation prompts before writing images</b>. You will still be required to <b>type the exact name</b> when selecting a system drive.")
             Accessible.name: text.replace(/<[^>]+>/g, '')  // Strip HTML tags for accessibility
         }
 

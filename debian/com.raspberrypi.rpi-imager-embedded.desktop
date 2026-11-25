@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Raspberry Pi Imager (Embedded)
-Comment=Raspberry Pi Imager for embedded systems
+Name=vBase Imager (Embedded)
+Comment=Write the vBase installer image to a USB stick
 Exec=rpi-imager-embedded
 Icon=rpi-imager
 Terminal=false

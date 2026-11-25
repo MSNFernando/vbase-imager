@@ -14,14 +14,14 @@ Button {
     id: control
     font.family: Style.fontFamily
     font.pointSize: Style.fontSizeSm
-    font.capitalization: Font.AllUppercase
+    font.capitalization: Font.MixedCase  // vBase Imager: sentence case
     
     // Allow instances to provide a custom accessibility description
     property string accessibleDescription: ""
     
     background: Rectangle {
         color: control.enabled ? (control.activeFocus ? Style.buttonFocusedBackgroundColor : (control.hovered ? Style.buttonHoveredBackgroundColor : Style.buttonBackgroundColor)) : Qt.rgba(0, 0, 0, 0.1)
-        radius: Style.cornerRadius(4)
+        radius: Style.cornerRadius(Style.radiusControl)
         border.color: control.enabled ? Style.popupBorderColor : Qt.rgba(0, 0, 0, 0.2)
         border.width: 1
         antialiasing: true  // Smooth edges at non-integer scale factors

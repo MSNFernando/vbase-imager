@@ -6,7 +6,7 @@ if(BUILD_CLI_ONLY)
 else()
     # GUI build: create app bundle
     # Set application name with proper spacing
-    set(APP_NAME "Raspberry Pi Imager")
+    set(APP_NAME "vBase Imager")
 
     # Set all required bundle properties
     set(MACOSX_BUNDLE_BUNDLE_NAME "${APP_NAME}")
@@ -211,6 +211,17 @@ if(EXISTS "${PRECOMPILED_ASSETS_CAR}" AND NOT BUILD_CLI_ONLY)
             "${PRECOMPILED_ICNS}"
             "${APP_BUNDLE_PATH}/Contents/Resources/AppIcon.icns"
         COMMENT "Installing pre-compiled icon assets for Liquid Glass support"
+    )
+endif()
+
+# vBase Imager ships only the .icns (generated from src/linux/icon/rpi-imager.svg);
+# without an Assets.car, install it under the name CFBundleIconFile expects.
+if(NOT EXISTS "${PRECOMPILED_ASSETS_CAR}" AND EXISTS "${PRECOMPILED_ICNS}" AND NOT BUILD_CLI_ONLY)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "${PRECOMPILED_ICNS}"
+            "${APP_BUNDLE_PATH}/Contents/Resources/AppIcon.icns"
+        COMMENT "Installing AppIcon.icns"
     )
 endif()
 

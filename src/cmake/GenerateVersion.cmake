@@ -17,9 +17,13 @@ if(GIT_EXECUTABLE)
     # which reads an unparseable version as "older than everything" and offers
     # an upgrade to whatever the server lists. Both prefixes are allowed
     # because this repository carries 1.6.1 as well as v1.6.2.
+    #
+    # vBase Imager: the fork still carries upstream's v2.x tags, so only
+    # vBase release tags ("vbase-v1.0.0") count, with the prefix dropped.
+    # With none yet, the version reads 1.0.0-dev-g<hash>.
     execute_process(
-        COMMAND "${GIT_EXECUTABLE}" describe --tags --always --dirty
-                --match "v[0-9]*" --match "[0-9]*"
+        COMMAND "${GIT_EXECUTABLE}" describe --tags --dirty
+                --match "vbase-v[0-9]*"
         WORKING_DIRECTORY "${SOURCE_DIR}"
         OUTPUT_VARIABLE GIT_DESCRIBE
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -27,7 +31,21 @@ if(GIT_EXECUTABLE)
         RESULT_VARIABLE GIT_RESULT
     )
     if(GIT_RESULT EQUAL 0 AND GIT_DESCRIBE)
-        set(VERSION_STR "${GIT_DESCRIBE}")
+        string(REGEX REPLACE "^vbase-" "" VERSION_STR "${GIT_DESCRIBE}")
+    else()
+        execute_process(
+            COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD
+            WORKING_DIRECTORY "${SOURCE_DIR}"
+            OUTPUT_VARIABLE GIT_SHORT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+            RESULT_VARIABLE GIT_SHORT_RESULT
+        )
+        if(GIT_SHORT_RESULT EQUAL 0 AND GIT_SHORT)
+            set(VERSION_STR "1.0.0-dev-g${GIT_SHORT}")
+        else()
+            set(VERSION_STR "1.0.0-dev")
+        endif()
     endif()
 endif()
 

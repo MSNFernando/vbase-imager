@@ -14,7 +14,7 @@ Button {
     id: control
     font.family: Style.fontFamily
     font.pointSize: Style.fontSizeSm
-    font.capitalization: Font.AllUppercase
+    font.capitalization: Font.MixedCase  // vBase Imager: sentence case
     
     // Allow instances to provide a custom accessibility description
     property string accessibleDescription: ""
@@ -25,7 +25,7 @@ Button {
                    ? Style.button2HoveredBackgroundColor
                    : (control.hovered ? Style.button2HoveredBackgroundColor : Style.button2BackgroundColor))
                : Qt.rgba(0, 0, 0, 0.1)
-        radius: Style.cornerRadius(4)
+        radius: Style.cornerRadius(Style.radiusControl)
         antialiasing: true  // Smooth edges at non-integer scale factors
         clip: true  // Prevent content overflow at non-integer scale factors
     }

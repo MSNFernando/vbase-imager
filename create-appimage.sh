@@ -92,7 +92,9 @@ SOURCE_DIR="src/"
 CMAKE_FILE="${SOURCE_DIR}CMakeLists.txt"
 
 # Get version from git tag (same approach as CMake)
-GIT_VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "0.0.0-unknown")
+# vBase Imager: only vbase-v* tags count (upstream v2.x tags are still in the fork)
+GIT_VERSION=$(git describe --tags --dirty --match 'vbase-v[0-9]*' 2>/dev/null | sed 's/^vbase-//')
+[ -n "$GIT_VERSION" ] || GIT_VERSION="1.0.0-dev-g$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
 # Extract numeric version components for compatibility
 # Match versions like: v1.2.3, 1.2.3, v1.2.3-extra, etc.
@@ -446,7 +448,7 @@ export APPIMAGE_EXTRACT_AND_RUN=1
     --output=appimage \
     --verbosity=0
 
-LINUXDEPLOY_OUTPUT="Raspberry_Pi_Imager-${ARCH}.AppImage"
+LINUXDEPLOY_OUTPUT="vBase_Imager-${ARCH}.AppImage"
 if [ -f "$LINUXDEPLOY_OUTPUT" ]; then
     echo "Renaming '$LINUXDEPLOY_OUTPUT' to '$(basename "$OUTPUT_FILE")'"
     mv "$LINUXDEPLOY_OUTPUT" "$OUTPUT_FILE"
