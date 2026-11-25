@@ -2408,7 +2408,7 @@ bool DownloadThread::_verify()
     {
         emit eventVerify(static_cast<quint32>(t1.elapsed()), false,
                          _writehash.result().toHex(), _verifyhash.result().toHex());
-        DownloadThread::_onDownloadError(tr("Verifying write failed. Contents of SD card is different from what was written to it."));
+        DownloadThread::_onDownloadError(tr("Verifying write failed. The contents of the USB stick differ from what was written to it."));
     }
 
     return false;
