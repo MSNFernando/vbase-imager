@@ -114,8 +114,8 @@ ApplicationWindow {
             showLanguageSelection: window.showLanguageSelection
 
             onWizardCompleted: {
-                // Reset to start of wizard or close application
-                wizardContainer.currentStep = 0;
+                // Back to the release list (vBase Imager has no device step)
+                wizardContainer.jumpToStep(wizardContainer.stepOSSelection);
             }
 
             onAppOptionsRequested: {

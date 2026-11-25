@@ -22,6 +22,9 @@
         <file>icons/ic_sd_storage_40px.svg</file>
         <file>icons/ic_storage_40px.svg</file>
         <file>icons/ic_usb_40px.svg</file>
+        <file>icons/vbase_usb.svg</file>
+        <file>icons/vbase_release.svg</file>
+        <file>icons/vbase_stick_40px.svg</file>
         <file>icons/use_custom.png</file>
         <file>icons/erase.png</file>
         <file>icons/cat_raspberry_pi_os.png</file>

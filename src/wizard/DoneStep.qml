@@ -16,7 +16,8 @@ import RpiImager
 WizardStepBase {
     id: root
     
-    title: qsTr("Write complete!")
+    title: qsTr("Your vBase stick is ready")
+    subtitle: qsTr("%1 to %2").arg(wizardContainer.selectedOsName).arg(wizardContainer.selectedStorageName)
     showBackButton: false
     showNextButton: false
     readonly property var ejectState: ImageWriterSingleton.ejectState
@@ -47,6 +48,57 @@ WizardStepBase {
         anchors.fill: parent
         anchors.margins: Style.cardPadding
         spacing: Style.spacingLarge
+
+        // vBase Imager: what to do with the stick next
+        Rectangle {
+            id: nextStepsCard
+            objectName: "vbaseNextStepsCard"
+            Layout.fillWidth: true
+            Layout.preferredHeight: nextStepsColumn.implicitHeight + Style.spacingMedium * 2
+            radius: Style.cornerRadius(Style.radiusXl)
+            color: Style.successSubtleColor
+            border.color: Style.successColor
+            border.width: 1
+
+            ColumnLayout {
+                id: nextStepsColumn
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: Style.spacingMedium
+                spacing: Style.spacingSmall
+
+                FocusableHeading {
+                    id: nextStepsHeading
+                    text: qsTr("Safe to remove the stick")
+                    font.pointSize: Style.fontSizeHeading
+                    font.family: Style.fontFamilyBold
+                    font.bold: true
+                    color: Style.successForegroundColor
+                    Layout.fillWidth: true
+                }
+                Repeater {
+                    model: [
+                        qsTr("Plug it into the server's internal or rear USB port."),
+                        qsTr("Boot from it: on IBM System x press F12 and choose the USB device."),
+                        qsTr("Follow the setup on the server's screen, then open the address it shows in a browser.")
+                    ]
+                    Text {
+                        required property int index
+                        required property string modelData
+                        text: (index + 1) + ". " + modelData
+                        textFormat: Text.PlainText
+                        wrapMode: Text.WordWrap
+                        font.family: Style.fontFamily
+                        font.pointSize: Style.fontSizeDescription
+                        color: Style.formLabelColor
+                        Layout.fillWidth: true
+                        Accessible.role: Accessible.StaticText
+                        Accessible.name: text
+                    }
+                }
+            }
+        }
         
         // What was configured (de-chromed)
         ColumnLayout {
@@ -55,6 +107,7 @@ WizardStepBase {
             
             FocusableHeading {
                 id: choicesHeading
+                visible: false  // vBase Imager: the subtitle names release and stick
                 text: qsTr("Your choices:")
                 font.pointSize: Style.fontSizeHeading
                 font.family: Style.fontFamilyBold
@@ -65,6 +118,7 @@ WizardStepBase {
             
             GridLayout {
                 id: choicesGrid
+                visible: false  // vBase Imager: see subtitle
                 Layout.fillWidth: true
                 columns: 2
                 columnSpacing: Style.formColumnSpacing
@@ -287,8 +341,8 @@ WizardStepBase {
 
         ImButton {
             id: writeAnotherButton
-            text: qsTr("Write Another")
-            accessibleDescription: qsTr("Return to storage selection to write the same image to another storage device")
+            text: qsTr("Write another stick")
+            accessibleDescription: qsTr("Choose another USB stick and write the same release to it")
             enabled: !root.ejectInProgress
             activeFocusOnTab: true
             Layout.minimumWidth: Style.buttonWidthMinimum
@@ -302,8 +356,8 @@ WizardStepBase {
         
         ImButtonRed {
             id: finishButton
-            text: ImageWriterSingleton.isEmbeddedMode() ? qsTr("Reboot") : CommonStrings.finish
-            accessibleDescription: root.ejectInProgress ? qsTr("Available once the storage device has been ejected") : (ImageWriterSingleton.isEmbeddedMode() ? qsTr("Reboot the system to apply changes") : qsTr("Close Raspberry Pi Imager and exit the application"))
+            text: ImageWriterSingleton.isEmbeddedMode() ? qsTr("Reboot") : qsTr("Close")
+            accessibleDescription: root.ejectInProgress ? qsTr("Available once the storage device has been ejected") : (ImageWriterSingleton.isEmbeddedMode() ? qsTr("Reboot the system to apply changes") : qsTr("Close vBase Imager"))
             enabled: !root.ejectInProgress
             activeFocusOnTab: true
             Layout.minimumWidth: Style.buttonWidthMinimum
@@ -336,7 +390,7 @@ WizardStepBase {
     Component.onCompleted: {
         // Register choices section as first focus group
         registerFocusGroup("choices", function() {
-            return [choicesHeading, deviceLabel, osLabel, storageLabel]
+            return [nextStepsHeading]
         }, 0)
         
         // Register customizations section as second focus group

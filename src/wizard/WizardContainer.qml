@@ -178,10 +178,11 @@ Item {
     Component.onCompleted: {
         // Set initial step based on language selection preference and network connectivity at startup.
         // Language selection step is shown first if requested, then device selection (if online) or OS selection (if offline).
+        // vBase Imager: there is no board to choose, so the wizard always
+        // starts at the release list (the Device step stays in the code for
+        // upstream merges but is never entered).
         if (showLanguageSelection) {
             currentStep = stepLanguageSelection
-        } else if (hasNetworkConnectivity) {
-            currentStep = stepDeviceSelection
         } else {
             currentStep = stepOSSelection
         }
@@ -215,10 +216,8 @@ Item {
             // When OS list becomes available after starting offline, navigate to device
             // selection so the user can choose their target device (now that the list is available).
             // Guard: don't interrupt an active write operation.
-            if (root.hasNetworkConnectivity && root.currentStep === root.stepOSSelection && !root.isWriting) {
-                console.log("OS list now available - navigating to device selection")
-                root.jumpToStep(root.stepDeviceSelection)
-            }
+            // vBase Imager: the release list is the first step either way,
+            // so a list that arrives late needs no navigation.
         }
     }
 
@@ -445,14 +444,141 @@ Item {
         }
     }
     
+    // vBase Imager header: app name, version and the three steps
+    // (Release, USB stick, Write) in place of the upstream sidebar.
+    readonly property var vbaseStepNames: [qsTr("Release"), qsTr("USB stick"), qsTr("Write")]
+    readonly property int vbaseStepIndex: currentStep >= stepWriting ? 2
+                                         : (currentStep === stepStorageSelection ? 1 : 0)
+
+    Rectangle {
+        id: headerBar
+        objectName: "vbaseHeaderBar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        height: headerRow.implicitHeight + Style.spacingSmall * 2
+        color: Style.cardBackgroundColor
+
+        RowLayout {
+            id: headerRow
+            anchors.fill: parent
+            anchors.leftMargin: Style.spacingLarge
+            anchors.rightMargin: Style.spacingLarge
+            spacing: Style.spacingSmall
+
+            Image {
+                source: "../icons/vbase_usb.svg"
+                Layout.preferredWidth: 22
+                Layout.preferredHeight: 22
+                sourceSize: Qt.size(44, 44)
+                fillMode: Image.PreserveAspectFit
+                Accessible.ignored: true
+            }
+            Text {
+                text: "vBase Imager"
+                textFormat: Text.PlainText
+                font.family: Style.fontFamilyBold
+                font.bold: true
+                font.pointSize: Style.fontSizeHeading
+                color: Style.formLabelColor
+                Accessible.role: Accessible.Heading
+                Accessible.name: text
+            }
+            Text {
+                text: ImageWriterSingleton.constantVersion()
+                textFormat: Text.PlainText
+                font.family: Style.fontFamily
+                font.pointSize: Style.fontSizeCaption
+                color: Style.textMetadataColor
+                elide: Text.ElideRight
+                Layout.maximumWidth: Style.scaled(140)
+            }
+            Item { Layout.fillWidth: true }
+
+            Repeater {
+                model: root.vbaseStepNames
+                Rectangle {
+                    id: stepPill
+                    required property int index
+                    required property string modelData
+                    readonly property bool isCurrent: index === root.vbaseStepIndex
+                    readonly property bool isDone: index < root.vbaseStepIndex
+                                                   || (index === 2 && root.currentStep === root.stepDone)
+                    Layout.preferredHeight: Style.scaled(28)
+                    Layout.preferredWidth: pillRow.implicitWidth + Style.spacingSmall * 2
+                    radius: height / 2
+                    color: isCurrent && !isDone ? Style.inverseColor : Style.transparent
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: qsTr("Step %1 of 3: %2").arg(index + 1).arg(modelData)
+                                     + (isCurrent ? ", " + qsTr("current") : (isDone ? ", " + qsTr("done") : ""))
+
+                    RowLayout {
+                        id: pillRow
+                        anchors.centerIn: parent
+                        spacing: Style.spacingXSmall
+                        Rectangle {
+                            Layout.preferredWidth: Style.scaled(20)
+                            Layout.preferredHeight: Style.scaled(20)
+                            radius: width / 2
+                            color: stepPill.isDone ? Style.successSubtleColor
+                                 : (stepPill.isCurrent ? Style.primaryColor : Style.mutedColor)
+                            Text {
+                                anchors.centerIn: parent
+                                text: stepPill.isDone ? "\u2713" : String(stepPill.index + 1)
+                                font.family: Style.fontFamilyBold
+                                font.bold: true
+                                font.pointSize: Style.fontSizeCaption
+                                color: stepPill.isDone ? Style.successForegroundColor
+                                     : (stepPill.isCurrent ? Style.primaryForegroundColor : Style.formLabelColor)
+                            }
+                        }
+                        Text {
+                            text: stepPill.modelData
+                            textFormat: Text.PlainText
+                            font.family: Style.fontFamilyBold
+                            font.bold: true
+                            font.pointSize: Style.fontSizeCaption
+                            color: stepPill.isCurrent && !stepPill.isDone ? Style.inverseForegroundColor
+                                 : (stepPill.isDone ? Style.formLabelColor : Style.textMetadataColor)
+                        }
+                    }
+                }
+            }
+
+            ImButton {
+                id: optionsButton
+                objectName: "vbaseOptionsButton"
+                text: qsTr("Options")
+                accessibleDescription: qsTr("Open application settings: sound, auto-eject and the release list source")
+                Layout.leftMargin: Style.spacingSmall
+                Layout.preferredHeight: Style.scaled(32)
+                activeFocusOnTab: true
+                onClicked: root.appOptionsRequested()
+            }
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: 1
+            color: Style.borderSubtleColor
+        }
+    }
+
     // Main horizontal layout
     RowLayout {
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.top: headerBar.bottom
         spacing: 0
         
         // Sidebar
         Rectangle {
             id: sidebar
+            // vBase Imager: replaced by headerBar above.
+            visible: false
             Layout.preferredWidth: root.sidebarWidthValue
             Layout.minimumWidth: Style.sidebarMinWidth
             Layout.maximumWidth: Style.sidebarMaxWidth
@@ -725,7 +851,7 @@ Item {
                 z: 2
 
                 ImButton {
-                    id: optionsButton
+                    id: sidebarOptionsButton
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
@@ -740,6 +866,7 @@ Item {
         // Interactive drag handle for resizing sidebar
         Item {
             id: dragHandle
+            visible: false  // vBase Imager: no sidebar to resize
             Layout.preferredWidth: Style.sidebarDragHandleWidth
             Layout.fillHeight: true
 
@@ -803,8 +930,7 @@ Item {
             
             // Skip device selection if offline (no network = no device list available)
             // Start with language selection if requested, otherwise device selection if online, or OS selection if offline
-            initialItem: root.showLanguageSelection ? languageSelectionStep : 
-                        (root.hasNetworkConnectivity ? deviceSelectionStep : osSelectionStep)
+            initialItem: root.showLanguageSelection ? languageSelectionStep : osSelectionStep
             
             // Smooth transitions between steps
             pushEnter: Transition {
@@ -873,8 +999,9 @@ Item {
                 nextIndex = stepWriting
                 writeAnotherMode = false  // Reset the flag
             }
-            // If customization is not supported, skip customization steps entirely
-            else if (!customizationSupported && nextIndex === firstCustomizationStep) {
+            // vBase Imager has no customisation steps: Storage goes straight
+            // to Writing.
+            else if (nextIndex === firstCustomizationStep) {
                 nextIndex = stepWriting
             }
             // Skip optional Secure Boot step when OS does not support it
@@ -891,18 +1018,10 @@ Item {
             }
             // Before entering the writing step, apply customization (when supported)
             if (nextIndex === stepWriting) {
-                if (customizationSupported && ImageWriterSingleton && !replayPreviousWrite) {
-                    // Pass session flags so the generator can skip unconfigured sections
-                    customizationSettings.wifiConfigured = wifiConfigured
-                    // Pass the complete customizationSettings object directly to the generator
-                    // This includes both persistent settings (hostname, wifi, etc.) and
-                    // ephemeral settings (piConnectEnabled) from the current wizard session
-                    ImageWriterSingleton.applyCustomisationFromSettings(customizationSettings)
-                } else if (replayPreviousWrite) {
-                    // Reuse the exact customisation payload staged for the previous write.
-                    // Regenerating from saved settings can re-apply customisations the user skipped.
-                }
-                
+                // vBase Imager writes the installer image untouched: no
+                // customisation is ever staged (upstream called
+                // applyCustomisationFromSettings() here).
+
                 // Capture snapshot of customization flags at write summary stage
                 // This preserves the state for the completion screen, before any write operations
                 // or token clearing happens. This is the most reliable place to capture it.
@@ -937,8 +1056,12 @@ Item {
             // From Writing step:
             // - If customization not supported, jump straight back to Storage Selection
             // - If Raspberry Pi Connect step is not available, skip it when navigating back
-            if (root.currentStep === stepWriting && !customizationSupported) {
+            if (root.currentStep === stepWriting) {
+                // vBase Imager: no customisation steps to return through
                 prevIndex = stepStorageSelection
+            } else if (prevIndex === stepDeviceSelection) {
+                // vBase Imager: the release list is the first step
+                return
             } else {
                 // Skip interfaces and features if OS doesn't support it or no capabilities are available
                 if (prevIndex == stepIfAndFeatures && (!ccRpiAvailable || !ifAndFeaturesAvailable)) {
@@ -1012,11 +1135,7 @@ Item {
             onNextClicked: {
                 // After choosing language, jump to first real wizard step
                 // Skip device selection if offline
-                if (root.hasNetworkConnectivity) {
-                    root.jumpToStep(root.stepDeviceSelection)
-                } else {
-                    root.jumpToStep(root.stepOSSelection)
-                }
+                root.jumpToStep(root.stepOSSelection)
             }
         }
     }
@@ -1034,8 +1153,8 @@ Item {
         id: osSelectionStep
         OSSelectionStep {
             wizardContainer: root
-            // Hide back button when offline (device selection was skipped)
-            showBackButton: root.hasNetworkConnectivity
+            // vBase Imager: first step, nothing to go back to
+            showBackButton: false
             appOptionsButton: optionsButton
             onNextClicked: root.nextStep()
             onBackClicked: root.previousStep()
@@ -1048,7 +1167,8 @@ Item {
         StorageSelectionStep {
             wizardContainer: root
             appOptionsButton: optionsButton
-            onNextClicked: root.nextStep()
+            // Guarded: the step only enables Next once the erase is confirmed
+            onNextClicked: if (nextButtonEnabled) root.nextStep()
             onBackClicked: root.previousStep()
         }
     }
@@ -1546,7 +1666,7 @@ Item {
     function resetWizard() {
         // Reset all wizard state to initial values
         // Start at OS selection if offline, device selection if online
-        currentStep = hasNetworkConnectivity ? 0 : 1
+        currentStep = stepOSSelection
         permissibleStepsBitmap = 1  // Reset to only Device step permissible
         writeAnotherMode = false
         selectedDeviceName = ""
@@ -1586,7 +1706,7 @@ Item {
         
         // Navigate back to the first step (device selection if online, OS selection if offline)
         wizardStack.clear()
-        wizardStack.push(hasNetworkConnectivity ? deviceSelectionStep : osSelectionStep)
+        wizardStack.push(osSelectionStep)
     }
     
     function resetToWriteStep() {

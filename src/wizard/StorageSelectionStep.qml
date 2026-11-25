@@ -16,9 +16,20 @@ import RpiImager
 WizardStepBase {
     id: root
     
-    title: qsTr("Select your storage device")
+    title: qsTr("Choose the USB stick")
+    subtitle: qsTr("Only removable drives are listed. Your computer's own disks never appear here. Use a stick of 32 GB or more (USB 3, from a known brand): the server keeps its settings and database on it.")
     showNextButton: true
-    nextButtonEnabled: wizardContainer && wizardContainer.selectedStorageName && wizardContainer.selectedStorageName.length > 0  // Disabled until user selects a storage device
+    nextButtonText: qsTr("Erase and write")
+    nextButtonAccessibleDescription: qsTr("Erase the chosen USB stick and write the vBase installer to it. Tick the confirmation first.")
+    // vBase Imager: a stick must be chosen AND the erase explicitly confirmed.
+    nextButtonEnabled: wizardContainer && wizardContainer.selectedStorageName
+                       && wizardContainer.selectedStorageName.length > 0 && root.eraseConfirmed
+
+    // vBase Imager: smallest stick accepted. Sticks sold as "32 GB" report
+    // roughly 28.6-31 GB, so the limit sits just under that.
+    readonly property real minimumDriveBytes: 28000000000
+    property bool eraseConfirmed: false
+    property var selectedMountpoints: []
     
     // Forward the nextClicked signal as next() function
     // Only auto-advance if no system drive confirmation dialog is needed
@@ -54,8 +65,9 @@ WizardStepBase {
                 }
             }
         }
-        // Safe to auto-advance for non-system drives
-        root.nextClicked()
+        // vBase Imager: never past the erase confirmation
+        if (root.nextButtonEnabled)
+            root.nextClicked()
     }
     
     property alias dstlist: dstlist
@@ -68,7 +80,7 @@ WizardStepBase {
     Component.onCompleted: {
         // Register the ListView for keyboard navigation
         root.registerFocusGroup("storage_list", function(){
-            return [dstlist, filterSystemDrives]
+            return [dstlist, eraseConfirmCheck]
         }, 0)
         
         // Set the initial focus item to the ListView
@@ -87,7 +99,8 @@ WizardStepBase {
                 // Device was removed - clear the visual selection and ensure next button is disabled
                 dstlist.currentIndex = -1
                 root.selectedDeviceName = ""
-                root.nextButtonEnabled = false
+                root.selectedMountpoints = []
+                root.eraseConfirmed = false
             }
         }
     }
@@ -163,7 +176,8 @@ WizardStepBase {
             Layout.fillHeight: true
             model: ImageWriterSingleton.getDriveList()
             delegate: dstdelegate
-            keyboardAutoAdvance: true
+            // vBase Imager: choosing a stick must not start the erase
+            keyboardAutoAdvance: false
             nextFunction: root.conditionalNext
             isItemSelectableFunction: root.isStorageItemSelectable
             accessibleName: {
@@ -245,20 +259,17 @@ WizardStepBase {
                     // Check for enumeration error first
                     if (root.enumerationErrorMessage.length > 0) {
                         return qsTr("Could not list storage devices: %1").arg(root.enumerationErrorMessage)
-                    } else if (!root.hasAnyDevices) {
-                        return qsTr("No storage devices found")
-                    } else if (root.hasOnlyReadOnlyDevices) {
-                        if (filterSystemDrives.checked) {
-                            return qsTr("All visible devices are read-only.\nTry connecting a new device, or uncheck\n'Exclude system drives' below.")
-                        } else {
-                            return qsTr("All devices are read-only.\nPlease connect a writable storage device.")
-                        }
                     } else {
-                        return qsTr("All devices are hidden by the filter.\nUncheck 'Exclude system drives' below\nto show system drives.")
+                        return qsTr("No usable USB stick found. Plug in a stick of 32 GB or more.")
                     }
                 }
-                // Make it invisible but still accessible to screen readers
-                opacity: 0
+                // vBase Imager: shown, centred, so an empty list explains itself
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignBottom
+                wrapMode: Text.WordWrap
+                color: Style.textMetadataColor
+                font.family: Style.fontFamily
+                font.pointSize: Style.fontSizeDescription
                 Accessible.role: Accessible.StatusBar
                 Accessible.name: text
                 Accessible.ignored: false
@@ -294,9 +305,57 @@ WizardStepBase {
             }
         }
         
-        // Filter controls
+        // vBase Imager: explicit erase confirmation for the chosen stick
+        ColumnLayout {
+            id: eraseConfirmBox
+            objectName: "eraseConfirmBox"
+            Layout.fillWidth: true
+            Layout.topMargin: Style.spacingSmall
+            spacing: Style.spacingSmall
+            visible: root.wizardContainer && root.wizardContainer.selectedStorageName.length > 0
+            onVisibleChanged: root.rebuildFocusOrder()
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: eraseWarningText.implicitHeight + Style.spacingSmall * 2
+                radius: Style.cornerRadius(Style.radiusMd)
+                color: Style.dangerSubtleColor
+                border.color: Style.dangerColor
+                border.width: 1
+                Text {
+                    id: eraseWarningText
+                    anchors.fill: parent
+                    anchors.margins: Style.spacingSmall
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+                    font.family: Style.fontFamilyBold
+                    font.pointSize: Style.fontSizeDescription
+                    color: Style.dangerForegroundColor
+                    text: {
+                        var mp = root.selectedMountpoints || []
+                        return mp.length > 0
+                            ? qsTr("Everything on %1 will be erased, including what is on %2.").arg(root.selectedDeviceName).arg(mp.join(", "))
+                            : qsTr("Everything on %1 will be erased.").arg(root.selectedDeviceName)
+                    }
+                    Accessible.role: Accessible.AlertMessage
+                    Accessible.name: text
+                }
+            }
+
+            ImCheckBox {
+                id: eraseConfirmCheck
+                objectName: "eraseConfirmCheck"
+                Layout.fillWidth: true
+                checked: root.eraseConfirmed
+                text: qsTr("I understand: erase %1").arg(root.selectedDeviceName)
+                onToggled: root.eraseConfirmed = checked
+            }
+        }
+
+        // Filter controls (vBase Imager: hidden; system drives are never offered)
         RowLayout {
             Layout.fillWidth: true
+            visible: false
             
             Item {
                 Layout.fillWidth: true
@@ -374,12 +433,16 @@ WizardStepBase {
             property bool isFastbootStorage: modelData && typeof modelData.isFastbootStorage !== "undefined" ? modelData.isFastbootStorage : false
             property string fastbootStorageType: modelData && typeof modelData.fastbootStorageType !== "undefined" ? modelData.fastbootStorageType : ""
 
-            readonly property bool shouldHide: isSystem && filterSystemDrives.checked
-            readonly property bool unselectable: isReadOnly && !isRpiboot && !isFastbootStorage
+            // vBase Imager: only removable drives; Raspberry Pi boot-mode
+            // devices never apply. Sticks under the minimum stay listed but
+            // cannot be chosen.
+            readonly property bool shouldHide: isSystem || isRpiboot || isFastbootStorage
+            readonly property bool tooSmall: parseFloat(size) < root.minimumDriveBytes
+            readonly property bool unselectable: isReadOnly || tooSmall
             
             // Accessibility properties
             Accessible.role: Accessible.ListItem
-            Accessible.name: dstitem.description + ". " + ImageWriterSingleton.formatSize(parseFloat(dstitem.size)) + (dstitem.mountpoints.length > 0 ? ". " + qsTr("Mounted as %1").arg(dstitem.mountpoints.join(", ")) : "") + (dstitem.unselectable ? ". " + qsTr("Read-only") : "")
+            Accessible.name: dstitem.description + ". " + ImageWriterSingleton.formatSize(parseFloat(dstitem.size)) + (dstitem.mountpoints.length > 0 ? ". " + qsTr("Mounted as %1").arg(dstitem.mountpoints.join(", ")) : "") + (dstitem.tooSmall ? ". " + qsTr("Too small: needs 32 GB or more") : (dstitem.isReadOnly ? ". " + qsTr("Read-only") : ""))
             Accessible.focusable: true
             Accessible.ignored: false
             
@@ -439,14 +502,8 @@ WizardStepBase {
                     // Storage icon
                     Image {
                         id: storageIcon
-                        source: dstitem.isRpiboot ? "../icons/ic_rpiboot_40px.svg" :
-                                dstitem.isFastbootStorage ? (
-                                    dstitem.fastbootStorageType === "nvme" ? "../icons/ic_storage_40px.svg" :
-                                    "../icons/ic_sd_storage_40px.svg"
-                                ) :
-                                dstitem.isUsb ? "../icons/ic_usb_40px.svg" :
-                                dstitem.isScsi ? "../icons/ic_storage_40px.svg" :
-                                "../icons/ic_sd_storage_40px.svg"
+                        // vBase Imager: every listed drive is a stick
+                        source: "../icons/vbase_stick_40px.svg"
                         Layout.preferredWidth: 40
                         Layout.preferredHeight: 40
                         fillMode: Image.PreserveAspectFit
@@ -502,9 +559,9 @@ WizardStepBase {
                         }
                     }
                     
-                    // Read-only indicator
+                    // Status: too small or read-only
                     Text {
-                        text: qsTr("Read-only")
+                        text: dstitem.tooSmall ? qsTr("Too small: needs 32 GB or more") : qsTr("Read-only")
                         font.pointSize: Style.fontSizeDescription
                         font.family: Style.fontFamily
                         color: Style.formLabelErrorColor
@@ -547,6 +604,9 @@ WizardStepBase {
             ImageWriterSingleton.setDst(dstitem.device, dstitem.size)
         }
         selectedDeviceName = dstitem.description || dstitem.device
+        // A new choice needs a new confirmation.
+        root.eraseConfirmed = false
+        root.selectedMountpoints = dstitem.mountpoints || []
         root.wizardContainer.selectedStorageName = dstitem.description || dstitem.device
         // Drives the org-mode branch in the Pi Connect customisation step
         // (device-identity registration vs. auth-key minting).  rpiboot
@@ -560,8 +620,7 @@ WizardStepBase {
         if (typeof ImageWriterSingleton.discardOrgMintedConnectToken === "function")
             ImageWriterSingleton.discardOrgMintedConnectToken()
 
-        // Do not auto-advance; enable Next
-        root.nextButtonEnabled = true
+        // Do not auto-advance; Next waits for the erase confirmation
     }
     
     // Select drive by model index (used when delegate item is not available,
@@ -587,8 +646,8 @@ WizardStepBase {
         var isFastbootStorageRole = 0x10B
 
         var isReadOnly = model.data(modelIndex, isReadOnlyRole)
-        if (isReadOnly) {
-            return  // Can't select read-only devices
+        if (isReadOnly || !root.isStorageItemSelectable(index)) {
+            return  // Can't select read-only, hidden or too-small devices
         }
 
         var isSystem = model.data(modelIndex, isSystemRole)
@@ -620,16 +679,20 @@ WizardStepBase {
             return false
         }
         
+        var sizeRole = 0x103
         var isReadOnlyRole = 0x106
         var isSystemRole = 0x107
+        var isRpibootRole = 0x10A
+        var isFastbootStorageRole = 0x10B
         
         var idx = model.index(index, 0)
         var isReadOnly = model.data(idx, isReadOnlyRole)
         var isSystem = model.data(idx, isSystemRole)
         
-        // Item is selectable if it's not read-only and either not a system drive or filter is off
-        var shouldHide = isSystem && filterSystemDrives.checked
-        return !isReadOnly && !shouldHide
+        // vBase Imager: removable, writable and at least the minimum size
+        var shouldHide = isSystem || model.data(idx, isRpibootRole) || model.data(idx, isFastbootStorageRole)
+        var tooSmall = parseFloat(model.data(idx, sizeRole)) < root.minimumDriveBytes
+        return !isReadOnly && !shouldHide && !tooSmall
     }
     
     // Check if there are any selectable items in the list
@@ -676,17 +739,8 @@ WizardStepBase {
         // Check for enumeration error first
         if (root.enumerationErrorMessage.length > 0) {
             return qsTr("Could not list storage devices: %1. This may be a permissions issue. Try running the application with administrator privileges.").arg(root.enumerationErrorMessage)
-        } else if (!root.hasAnyDevices) {
-            return qsTr("No storage devices found. Please connect a storage device to continue.")
-        } else if (root.hasOnlyReadOnlyDevices) {
-            if (filterSystemDrives.checked) {
-                return qsTr("No valid storage devices are currently available. All visible devices are read-only. Try connecting a new storage device, or uncheck 'Exclude system drives' to show hidden system drives.")
-            } else {
-                return qsTr("No valid storage devices are currently available. All devices are read-only. Please connect a writable storage device to continue.")
-            }
-        } else {
-            return qsTr("No valid storage devices are currently available. Uncheck 'Exclude system drives' to show hidden system drives, or connect a new storage device.")
         }
+        return qsTr("No usable USB stick found. Plug in a stick of 32 GB or more to continue.")
     }
     // Stern confirmation when disabling system drive filtering
     ConfirmUnfilterDialog {

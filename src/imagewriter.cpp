@@ -2743,16 +2743,11 @@ QJsonDocument ImageWriter::getFilteredOSlistDocument() {
         }
     }
 
+    // vBase Imager: no "Erase" (FAT32 format) entry -- the only job is
+    // writing the vBase installer. A local image file stays available.
     reference_os_list_array.append(QJsonObject({
-            {"name", QCoreApplication::translate("main", "Erase")},
-            {"description", QCoreApplication::translate("main", "Format card as FAT32")},
-            {"icon", "../icons/erase.png"},
-            {"url", "internal://format"},
-        }));
-
-    reference_os_list_array.append(QJsonObject({
-            {"name", QCoreApplication::translate("main", "Use custom")},
-            {"description", QCoreApplication::translate("main", "Select a custom .img from your computer")},
+            {"name", QCoreApplication::translate("main", "Use an image file instead…")},
+            {"description", QCoreApplication::translate("main", "Choose a vBase installer image (.img or .img.xz) on this computer")},
             {"icon", "../icons/use_custom.png"},
             {"url", "internal://custom"},
         }));

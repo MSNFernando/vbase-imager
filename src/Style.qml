@@ -26,6 +26,36 @@ Item {
     // Scale a base value by the text scaling factor, rounding to nearest int.
     function scaled(base) { return Math.round(base * textScale) }
 
+    // === vBase Imager design tokens (Unicron Group Design System, light) ===
+    readonly property color primaryColor: "#3f6212"
+    readonly property color primaryForegroundColor: "#ffffff"
+    readonly property color cardBackgroundColor: "#ffffff"
+    readonly property color backgroundSubtleColor: "#f7f8f4"
+    readonly property color foregroundColor: "#17221a"
+    readonly property color foregroundSecondaryColor: "#3d4740"
+    readonly property color mutedForegroundColor: "#5c665e"
+    readonly property color mutedColor: "#eef0ea"
+    readonly property color accentColor: "#ecf6dc"
+    readonly property color borderColor: "#e3e6df"
+    readonly property color borderSubtleColor: "#eef0ea"
+    readonly property color controlBorderColor: "#d5dbd0"
+    readonly property color inverseColor: "#17221a"
+    readonly property color inverseForegroundColor: "#ffffff"
+    readonly property color successColor: "#65a30d"
+    readonly property color successSubtleColor: "#dcfce7"
+    readonly property color successForegroundColor: "#14532d"
+    readonly property color warningColor: "#d97706"
+    readonly property color dangerColor: "#dc2626"
+    readonly property color dangerSubtleColor: "#fee2e2"
+    readonly property color dangerForegroundColor: "#7f1d1d"
+    readonly property color infoColor: "#4f46e5"
+    readonly property int radiusSm: 6
+    readonly property int radiusMd: 8
+    readonly property int radiusControl: 9
+    readonly property int radiusXl: 12
+    readonly property string fontFamilyMono: Qt.platform.os === "windows" ? "Consolas"
+                                           : (Qt.platform.os === "osx" ? "Menlo" : "monospace")
+
     // === COLORS ===
     readonly property color mainBackgroundColor: "#ffffff"
     readonly property color raspberryRed: "#ab1e3a"

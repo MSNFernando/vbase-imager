@@ -18,15 +18,13 @@ WizardStepBase {
     id: root
     objectName: "writingStep"
 
-    title: qsTr("Write image")
+    title: root.isComplete ? qsTr("Your vBase stick is ready")
+                           : qsTr("Writing %1").arg(wizardContainer.selectedOsName)
     subtitle: {
-        if (root.isWriting) {
-            return qsTr("Writing in progress — do not disconnect the storage device")
-        } else if (root.isComplete) {
-            return qsTr("Write complete")
-        } else {
-            return qsTr("Review your choices and write the image to the storage device")
-        }
+        var what = qsTr("%1 to %2").arg(wizardContainer.selectedOsName).arg(wizardContainer.selectedStorageName)
+        if (root.isWriting)
+            return what + " — " + qsTr("do not remove the stick")
+        return what
     }
     nextButtonText: {
         if (root.isWriting) {
@@ -34,7 +32,7 @@ WizardStepBase {
             if (ImageWriterSingleton.writeState === ImageWriterSingleton.Verifying) {
                 return qsTr("Skip verification")
             } else {
-                return qsTr("Cancel write")
+                return CommonStrings.cancel
             }
         } else if (root.isComplete) {
             return CommonStrings.continueText
@@ -87,6 +85,46 @@ WizardStepBase {
 
     // Disable back while writing
     backButtonEnabled: !root.isWriting
+
+    // vBase Imager: the four stages shown while writing. Imager streams the
+    // download through the SHA-256 check straight onto the stick, so the
+    // first three run together; verification reads the stick back after.
+    property real downloadNow: 0
+    property real downloadTotal: 0
+    property real writePercent: 0
+    property real verifyPercent: 0
+    readonly property bool verifyStarted: root.isVerifying || root.isFinalising || root.isComplete
+    readonly property var stages: {
+        var st = function(title, detail, state, pct) {
+            return { "title": title, "detail": detail, "state": state, "pct": pct }
+        }
+        var started = root.isWriting || root.isComplete
+        var writingDone = root.verifyStarted
+        var dlKnown = root.downloadTotal > 0
+        var dlDone = writingDone || (dlKnown && root.downloadNow >= root.downloadTotal)
+        var dlDetail = dlKnown
+            ? qsTr("%1 of %2 from GitHub").arg(ImageWriterSingleton.formatSize(root.downloadNow)).arg(ImageWriterSingleton.formatSize(root.downloadTotal))
+            : qsTr("Read straight onto the stick as it arrives")
+        return [
+            st(dlDone ? qsTr("Downloaded") : qsTr("Download"), dlDetail,
+               !started ? "todo" : (dlDone ? "done" : "active"),
+               dlKnown ? Math.min(100, root.downloadNow * 100 / root.downloadTotal) : -1),
+            st(writingDone ? qsTr("Checked") : qsTr("Check SHA-256"),
+               writingDone ? qsTr("SHA-256 matches the release")
+                           : qsTr("Checked as it downloads; a mismatch stops the write"),
+               !started ? "todo" : (writingDone ? "done" : "active"), -1),
+            st(writingDone ? qsTr("Written") : qsTr("Write"),
+               writingDone ? qsTr("Image written to the stick")
+                           : (root.writePercent > 0 ? qsTr("%1% written").arg(Math.round(root.writePercent)) : qsTr("Preparing the stick")),
+               !started ? "todo" : (writingDone ? "done" : "active"),
+               root.isIndeterminateProgress ? -1 : root.writePercent),
+            st(root.isComplete ? qsTr("Verified") : qsTr("Verify"),
+               root.isComplete ? qsTr("Read back and compared, no differences")
+                               : qsTr("Reads the stick back and compares it"),
+               root.isComplete ? "done" : (root.isVerifying ? "active" : "todo"),
+               root.verifyPercent)
+        ]
+    }
 
     // Content
     content: [
@@ -283,11 +321,94 @@ WizardStepBase {
             spacing: Style.spacingMedium
             visible: root.isWriting || root.isComplete
 
+            // vBase Imager stage timeline
+            Rectangle {
+                id: stageCard
+                objectName: "vbaseStageCard"
+                Layout.fillWidth: true
+                Layout.preferredHeight: stageColumn.implicitHeight + Style.spacingMedium * 2
+                radius: Style.cornerRadius(Style.radiusXl)
+                color: Style.cardBackgroundColor
+                border.color: Style.borderColor
+                border.width: 1
+
+                ColumnLayout {
+                    id: stageColumn
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: Style.spacingMedium
+                    spacing: Style.spacingMedium
+
+                    Repeater {
+                        model: root.stages
+                        RowLayout {
+                            id: stageRow
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: Style.spacingSmall
+                            Accessible.role: Accessible.StaticText
+                            Accessible.name: modelData.title + ". " + modelData.detail
+
+                            Rectangle {
+                                Layout.alignment: Qt.AlignTop
+                                Layout.topMargin: Style.scaled(4)
+                                Layout.preferredWidth: Style.scaled(12)
+                                Layout.preferredHeight: Style.scaled(12)
+                                radius: width / 2
+                                color: stageRow.modelData.state === "done" ? Style.successColor
+                                     : (stageRow.modelData.state === "active" ? Style.infoColor : Style.mainBackgroundColor)
+                                border.color: stageRow.modelData.state === "todo" ? Style.borderColor : color
+                                border.width: 2
+                            }
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Style.spacingXXSmall
+                                Text {
+                                    text: stageRow.modelData.title
+                                    textFormat: Text.PlainText
+                                    font.family: Style.fontFamilyBold
+                                    font.bold: true
+                                    font.pointSize: Style.fontSizeFormLabel
+                                    color: stageRow.modelData.state === "todo" ? Style.textMetadataColor : Style.formLabelColor
+                                    Layout.fillWidth: true
+                                }
+                                Text {
+                                    text: stageRow.modelData.detail
+                                    textFormat: Text.PlainText
+                                    font.family: Style.fontFamily
+                                    font.pointSize: Style.fontSizeDescription
+                                    color: Style.textMetadataColor
+                                    wrapMode: Text.WordWrap
+                                    Layout.fillWidth: true
+                                }
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.topMargin: Style.spacingXSmall
+                                    Layout.preferredHeight: Style.scaled(8)
+                                    radius: height / 2
+                                    color: Style.mutedColor
+                                    visible: stageRow.modelData.state === "active" && stageRow.modelData.pct >= 0
+                                    Rectangle {
+                                        anchors.left: parent.left
+                                        anchors.top: parent.top
+                                        anchors.bottom: parent.bottom
+                                        radius: parent.radius
+                                        width: parent.width * Math.max(0, Math.min(100, stageRow.modelData.pct)) / 100
+                                        color: Style.primaryColor
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             FocusableText {
                 id: progressText
                 objectName: "writeProgressText"
                 text: qsTr("Starting write process...")
-                font.pointSize: Style.fontSizeHeading
+                font.pointSize: Style.fontSizeDescription
                 font.family: Style.fontFamilyBold
                 font.bold: true
                 color: Style.formLabelColor
@@ -316,7 +437,8 @@ WizardStepBase {
 
                 Material.accent: Style.progressBarVerifyForegroundColor
                 Material.background: Style.progressBarBackgroundColor
-                visible: root.isWriting
+                // vBase Imager: the stage card above carries the progress
+                visible: false
                 Accessible.role: Accessible.ProgressBar
                 Accessible.name: qsTr("Write progress")
                 // The description is the only place the figure can go: the
@@ -559,6 +681,10 @@ WizardStepBase {
             root.operationWarning = ""
             // Check if extract size is known upfront (e.g., gz files can't reliably store sizes >4GB)
             root.isIndeterminateProgress = !ImageWriterSingleton.isExtractSizeKnown()
+            root.downloadNow = 0
+            root.downloadTotal = 0
+            root.writePercent = 0
+            root.verifyPercent = 0
             progressText.text = qsTr("Starting write process...")
             progressBar.value = 0
             ImageWriterSingleton.startWrite()
@@ -648,8 +774,9 @@ WizardStepBase {
     }
 
     function onDownloadProgress(now, total) {
-        // Download progress is tracked for performance stats but not shown in UI
-        // (the write progress is more accurate as it reflects actual data written to disk)
+        // vBase Imager: shown as the Download stage
+        root.downloadNow = now
+        root.downloadTotal = total
     }
 
     function onWriteProgress(now, total) {
@@ -662,6 +789,7 @@ WizardStepBase {
             } else {
                 var progress = root.percentageOf(now, total)
                 progressBar.value = progress
+                root.writePercent = progress
                 progressText.text = qsTr("Writing... %1%").arg(Math.round(progress))
                 root.speak(root.progressAnnouncement("write", progress))
             }
@@ -673,6 +801,7 @@ WizardStepBase {
             root.operationWarning = ""  // Clear write warnings during verification
             var progress = root.percentageOf(now, total)
             progressBar.value = progress
+            root.verifyPercent = progress
             progressText.text = qsTr("Verifying... %1%").arg(Math.round(progress))
             root.speak(root.progressAnnouncement("verify", progress))
         }
@@ -787,5 +916,11 @@ WizardStepBase {
         Qt.callLater(function() {
             rebuildFocusOrder()
         })
+
+        // vBase Imager: the erase was already confirmed on the USB stick
+        // step ("I understand: erase ..."), so the write starts straight
+        // away. A retry after a failure still goes through confirmDialog.
+        if (!root.isWriting && !root.isComplete && ImageWriterSingleton.readyToWrite())
+            beginWriteDelay.start()
     }
 }

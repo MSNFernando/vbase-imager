@@ -20,9 +20,10 @@ WizardStepBase {
     readonly property HWListModel hwmodel: ImageWriterSingleton.getHWList()
     readonly property OSListModel osmodel: ImageWriterSingleton.getOSList()
     
-    title: qsTr("Choose operating system")
-    subtitle: qsTr("Select an operating system to install on your Raspberry Pi")
+    title: qsTr("Choose a vBase release")
+    subtitle: qsTr("The installer image for vBase hosts. It's downloaded from github.com/MSNFernando/vbase-releases and checked before anything is written.")
     showNextButton: true
+    nextButtonText: qsTr("Next: choose the USB stick")
     // Disable Next until a concrete OS has been selected
     nextButtonEnabled: oslist.currentIndex !== -1 && wizardContainer.selectedOsName.length > 0
     
@@ -288,7 +289,7 @@ WizardStepBase {
                 }
                 
                 Text {
-                    text: qsTr("Unable to download OS list. You can still use a local image file.")
+                    text: qsTr("Unable to download the vBase release list. You can still use an image file on this computer.")
                     font.pointSize: Style.fontSizeDescription
                     font.family: Style.fontFamily
                     color: Style.formLabelColor
@@ -302,7 +303,7 @@ WizardStepBase {
                     id: retryButton
                     objectName: "osListRetryButton"
                     text: qsTr("Retry")
-                    accessibleDescription: qsTr("Retry downloading the OS list")
+                    accessibleDescription: qsTr("Retry downloading the vBase release list")
                     onClicked: {
                         ImageWriterSingleton.beginOSListFetch()
                     }
@@ -352,14 +353,14 @@ WizardStepBase {
                         delegate: osdelegate
                         accessibleName: {
                             var count = oslist.count
-                            var name = qsTr("Operating system list")
+                            var name = qsTr("vBase release list")
                             
                             if (count === 0) {
-                                name += ". " + qsTr("No operating systems")
+                                name += ". " + qsTr("No releases")
                             } else if (count === 1) {
-                                name += ". " + qsTr("1 operating system")
+                                name += ". " + qsTr("1 entry")
                             } else {
-                                name += ". " + qsTr("%1 operating systems").arg(count)
+                                name += ". " + qsTr("%1 entries").arg(count)
                             }
                             
                             // The sublist says how to come back out of a
@@ -526,7 +527,8 @@ WizardStepBase {
                     // OS Icon
                     Image {
                         id: osicon
-                        source: delegateItem.icon
+                        // vBase Imager: a release glyph when the list names no icon
+                        source: delegateItem.icon.length > 0 ? delegateItem.icon : "../icons/vbase_release.svg"
                         cache: true
                         asynchronous: true
                         Layout.preferredWidth: 40
@@ -618,6 +620,22 @@ WizardStepBase {
                             color: Style.textMetadataColor
                             Layout.fillWidth: true
                             visible: delegateItem.release_date !== ""
+                            Accessible.ignored: true
+                        }
+
+                        // vBase Imager: show the checksum the download is held to.
+                        Text {
+                            textFormat: Text.PlainText
+                            readonly property string sha: typeof(delegateItem.extract_sha256) === "string" ? delegateItem.extract_sha256 : ""
+                            text: sha.length >= 16
+                                  ? qsTr("SHA-256 %1…%2 (checked while it is written)").arg(sha.substring(0, 8)).arg(sha.substring(sha.length - 8))
+                                  : ""
+                            font.pointSize: Style.fontSizeSmall
+                            font.family: Style.fontFamilyMono
+                            color: Style.textMetadataColor
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                            visible: text.length > 0
                             Accessible.ignored: true
                         }
                     }
@@ -823,13 +841,13 @@ WizardStepBase {
                     // Defer opening the native dialog until after the current event completes
                     Qt.callLater(function() {
                         ImageWriterSingleton.openFileDialog(
-                            qsTr("Select image"),
+                            qsTr("Select a vBase installer image"),
                             CommonStrings.imageFiltersString,
                             "customImage")
                     })
                 } else if (root.hasOwnProperty("customImageFileDialog")) {
                     // Ensure reasonable defaults
-                    customImageFileDialog.dialogTitle = qsTr("Select image")
+                    customImageFileDialog.dialogTitle = qsTr("Select a vBase installer image")
                     customImageFileDialog.nameFilters = CommonStrings.imageFiltersList
                     // Default to Downloads. writableLocation() already returns a
                     // platform-correct file:// URL, so use it directly.
