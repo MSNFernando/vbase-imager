@@ -68,7 +68,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-dx-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-dx-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);
@@ -574,7 +574,7 @@ TEST_CASE("DownloadExtractThread reports an archive that is not there", "[extrac
     const QString dest = scratch.filePath(QStringLiteral("unused.img"));
     REQUIRE(writeFile(dest, QByteArray(1024 * 1024, '\0')));
 
-    DownloadExtractThread dt("file:///nonexistent-rpi-imager/missing.img.xz", dest.toUtf8(),
+    DownloadExtractThread dt("file:///nonexistent-vbase-imager/missing.img.xz", dest.toUtf8(),
                              QByteArray());
 
     const Outcome outcome = runToCompletion(dt, 60000);
@@ -594,7 +594,7 @@ TEST_CASE("DownloadExtractThread reports a destination it cannot open", "[extrac
     REQUIRE(runTool(QStringLiteral("xz"), {QStringLiteral("-T1"), QStringLiteral("-2"), raw}));
 
     DownloadExtractThread dt(QUrl::fromLocalFile((raw + QStringLiteral(".xz"))).toEncoded(),
-                             "/nonexistent-rpi-imager-dir/deeper/dest.img", QByteArray());
+                             "/nonexistent-vbase-imager-dir/deeper/dest.img", QByteArray());
 
     const Outcome outcome = runToCompletion(dt, 60000);
     REQUIRE(outcome.finished);
@@ -702,7 +702,7 @@ TEST_CASE("LocalFileExtractThread reports a file that is not there", "[extract][
     const QString dest = scratch.filePath(QStringLiteral("missing-dest.img"));
     REQUIRE(writeFile(dest, QByteArray(1024 * 1024, '\0')));
 
-    LocalFileExtractThread dt("file:///nonexistent-rpi-imager/nowhere.img.xz",
+    LocalFileExtractThread dt("file:///nonexistent-vbase-imager/nowhere.img.xz",
                               dest.toUtf8(), QByteArray());
     dt.setVerifyEnabled(false);
 
@@ -1445,7 +1445,7 @@ public:
     // switched off -- skips these cases rather than failing them.
     explicit MountedFatDevice(int megabytes)
     {
-        _dir = QDir::temp().filePath(QStringLiteral("rpi-imager-mf-%1")
+        _dir = QDir::temp().filePath(QStringLiteral("vbase-imager-mf-%1")
                                          .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
         QDir().mkpath(_dir);
 
@@ -1577,7 +1577,7 @@ public:
 #else
     explicit MountedFatDevice(int megabytes)
     {
-        _dir = QDir::temp().filePath(QStringLiteral("rpi-imager-mf-%1")
+        _dir = QDir::temp().filePath(QStringLiteral("vbase-imager-mf-%1")
                                          .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
         QDir().mkpath(_dir);
         _mountPoint = QDir(_dir).filePath(QStringLiteral("mnt"));
@@ -1699,7 +1699,7 @@ TEST_CASE("DownloadExtractThread reports a multi-file archive it cannot read",
     if (!device.isReady())
         SKIP("the loop-backed FAT device could not be mounted");
 
-    DownloadExtractThread dt("file:///nonexistent-rpi-imager/missing.zip",
+    DownloadExtractThread dt("file:///nonexistent-vbase-imager/missing.zip",
                              device.device().toUtf8(), QByteArray());
     dt.setVerifyEnabled(false);
     dt.enableMultipleFileExtraction();
@@ -2063,14 +2063,14 @@ TEST_CASE("DownloadExtractThread will not write outside the target",
         "zo=zipfile.ZipFile(dst,'w',zipfile.ZIP_STORED)\n"
         "for n in zi.namelist():\n"
         "    data=zi.read(n)\n"
-        "    out='config.txt' if n=='config.txt' else '../../../../tmp/rpi-imager-escaped.txt'\n"
+        "    out='config.txt' if n=='config.txt' else '../../../../tmp/vbase-imager-escaped.txt'\n"
         "    zo.writestr(out,data)\n"
         "zo.close()\n");
     REQUIRE(runTool(QStringLiteral("python3"),
                     {QStringLiteral("-c"), py, archive, hostile},
                     QFileInfo(archive).absolutePath()));
 
-    const QString escapeTarget = QStringLiteral("/tmp/rpi-imager-escaped.txt");
+    const QString escapeTarget = QStringLiteral("/tmp/vbase-imager-escaped.txt");
     QFile::remove(escapeTarget);
 
     DownloadExtractThread dt(QUrl::fromLocalFile(hostile).toEncoded(),
@@ -2110,13 +2110,13 @@ TEST_CASE("DownloadExtractThread will not write to an absolute path",
         "import zipfile,sys\n"
         "zo=zipfile.ZipFile(sys.argv[1],'w',zipfile.ZIP_STORED)\n"
         "zo.writestr('config.txt', 'arm_64bit=1\\n')\n"
-        "zo.writestr('/tmp/rpi-imager-absolute.txt', 'written by absolute path\\n')\n"
+        "zo.writestr('/tmp/vbase-imager-absolute.txt', 'written by absolute path\\n')\n"
         "zo.close()\n");
     REQUIRE(runTool(QStringLiteral("python3"),
                     {QStringLiteral("-c"), py, hostile},
                     QFileInfo(hostile).absolutePath()));
 
-    const QString escapeTarget = QStringLiteral("/tmp/rpi-imager-absolute.txt");
+    const QString escapeTarget = QStringLiteral("/tmp/vbase-imager-absolute.txt");
     QFile::remove(escapeTarget);
 
     DownloadExtractThread dt(QUrl::fromLocalFile(hostile).toEncoded(),
@@ -2677,7 +2677,7 @@ bool plantMountShim(const QString &binDir)
         "#!/bin/sh\n"
         "folder=\"\"\n"
         "while [ $# -gt 0 ]; do folder=\"$1\"; shift; done\n"
-        "exec /usr/bin/mount -t tmpfs rpi-imager-fake \"$folder\"\n";
+        "exec /usr/bin/mount -t tmpfs vbase-imager-fake \"$folder\"\n";
     if (!writeFile(path, QByteArray(script)))
         return false;
     return QFile(path).setPermissions(

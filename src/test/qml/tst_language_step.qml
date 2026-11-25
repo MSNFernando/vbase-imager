@@ -190,7 +190,7 @@ TestCase {
         // The entry chosen is the one the application is already running in,
         // so changeLanguage is a no-op and the rest of the suite is not left
         // running in another language. Settings are isolated to the
-        // "rpi-imager-tests" organisation, so what this writes is a test file.
+        // "vbase-imager-tests" organisation, so what this writes is a test file.
         const c = combo()
         const shown = c.model.indexOf("English (British)")
         verify(shown >= 0, "this test is about the relabelled entry")

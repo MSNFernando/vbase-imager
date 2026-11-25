@@ -109,7 +109,7 @@ TEST_CASE("Closing twice is not an error", "[fileops-win]")
 TEST_CASE("A path that is not there is refused, and says why", "[fileops-win]")
 {
     auto ops = FileOperations::Create();
-    const auto err = ops->OpenDevice("C:/nowhere-at-all/rpi-imager/missing.img");
+    const auto err = ops->OpenDevice("C:/nowhere-at-all/vbase-imager/missing.img");
     CHECK(err != FileError::kSuccess);
     CHECK_FALSE(ops->IsOpen());
     // The Windows error code is carried out rather than collapsed, so a caller
@@ -1204,7 +1204,7 @@ class ScratchRegistryKey
 {
 public:
     ScratchRegistryKey()
-        : _path("Software\rpi-imager-test\\" +
+        : _path("Software\vbase-imager-test\\" +
                 QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString())
     {
         HKEY key = nullptr;
@@ -1341,7 +1341,7 @@ TEST_CASE("A setting that is not there, or not a number, is not read as on",
 
     // And no key at all.
     rpi_imager::WindowsWriteErrorTesting::readCfaFrom(
-        HKEY_CURRENT_USER, "Software\rpi-imager-test\definitely-not-here");
+        HKEY_CURRENT_USER, "Software\vbase-imager-test\definitely-not-here");
     CHECK(rpi_imager::WindowsWriteErrorTesting::cfaModeRead() == -1);
     CHECK_FALSE(rpi_imager::WindowsWriteErrorTesting::defenderBlocksDiskWritesHere());
 }

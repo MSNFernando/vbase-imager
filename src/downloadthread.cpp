@@ -1752,7 +1752,7 @@ QString DownloadThread::_classifiedWriteError()
     {
         case rpi_imager::WriteErrorClass::kAccessDeniedControlledFolderAccess:
             return tr("Access denied error while writing file to disk.") + "<br>" +
-                   tr("Controlled Folder Access seems to be enabled. Please add rpi-imager.exe to the list of allowed apps and try again.");
+                   tr("Controlled Folder Access seems to be enabled. Please add vbase-imager.exe to the list of allowed apps and try again.");
         case rpi_imager::WriteErrorClass::kAccessDenied:
             return tr("Access denied error while writing file to disk.") + "<br>" +
                    tr("The disk may be write-protected or in use by another application. Please ensure the disk is not mounted and try again.");

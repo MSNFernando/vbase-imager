@@ -65,7 +65,7 @@ class ScratchDir {
  public:
   ScratchDir() {
     base_ = fs::temp_directory_path() /
-            ("rpi-imager-file-ops-" + std::to_string(getpid()));
+            ("vbase-imager-file-ops-" + std::to_string(getpid()));
     std::error_code ec;
     fs::remove_all(base_, ec);
     fs::create_directories(base_, ec);
@@ -455,7 +455,7 @@ TEST_CASE("A device that is not there fails rather than prompting",
   // authorisation dialog can fix, so asking would be a prompt whose only
   // possible outcome is the failure we already have.
   auto ops = FileOperations::Create();
-  CHECK(ops->OpenDevice("/dev/rpi-imager-no-such-device") != FileError::kSuccess);
+  CHECK(ops->OpenDevice("/dev/vbase-imager-no-such-device") != FileError::kSuccess);
   CHECK(ops->GetLastErrorCode() == ENOENT);
   CHECK_FALSE(ops->IsOpen());
 }
@@ -832,7 +832,7 @@ class AlignedBlock {
 }  // namespace
 
 TEST_CASE("Async writes complete and land", "[fileops][async]") {
-  AsyncFixture fx("rpi-imager-async-land.img");
+  AsyncFixture fx("vbase-imager-async-land.img");
   if (!fx.haveDevice())
     SKIP("no loopback device available (needs CAP_SYS_ADMIN or passwordless sudo)");
   REQUIRE(fx.open());
@@ -869,7 +869,7 @@ TEST_CASE("Async writes complete and land", "[fileops][async]") {
 // asserting my guess at it would be worse than none.
 
 TEST_CASE("The queue depth can be shrunk for recovery", "[fileops][async]") {
-  AsyncFixture fx("rpi-imager-async-depth.img");
+  AsyncFixture fx("vbase-imager-async-depth.img");
   if (!fx.haveDevice())
     SKIP("no loopback device available (needs CAP_SYS_ADMIN or passwordless sudo)");
   REQUIRE(fx.open());
@@ -900,7 +900,7 @@ TEST_CASE("The queue depth can be shrunk for recovery", "[fileops][async]") {
 }
 
 TEST_CASE("Pending writes are reported in offset order", "[fileops][async]") {
-  AsyncFixture fx("rpi-imager-async-sorted.img");
+  AsyncFixture fx("vbase-imager-async-sorted.img");
   if (!fx.haveDevice())
     SKIP("no loopback device available (needs CAP_SYS_ADMIN or passwordless sudo)");
   REQUIRE(fx.open());
@@ -921,7 +921,7 @@ TEST_CASE("Pending writes are reported in offset order", "[fileops][async]") {
 }
 
 TEST_CASE("Direct I/O can be turned off and writing still works", "[fileops][async]") {
-  AsyncFixture fx("rpi-imager-async-directio.img");
+  AsyncFixture fx("vbase-imager-async-directio.img");
   if (!fx.haveDevice())
     SKIP("no loopback device available (needs CAP_SYS_ADMIN or passwordless sudo)");
   REQUIRE(fx.open());
@@ -938,7 +938,7 @@ TEST_CASE("Direct I/O can be turned off and writing still works", "[fileops][asy
 }
 
 TEST_CASE("Async statistics are recorded and can be reset", "[fileops][async]") {
-  AsyncFixture fx("rpi-imager-async-stats.img");
+  AsyncFixture fx("vbase-imager-async-stats.img");
   if (!fx.haveDevice())
     SKIP("no loopback device available (needs CAP_SYS_ADMIN or passwordless sudo)");
   REQUIRE(fx.open());
@@ -1201,7 +1201,7 @@ TEST_CASE("An async write that fails at completion is reported",
 // PwriteAligned commits by read-modify-write at the next flush.
 #ifndef __APPLE__
 TEST_CASE("A device using direct I/O refuses a partial sector", "[fileops][loop]") {
-  AsyncFixture fx("rpi-imager-partial-sector.img");
+  AsyncFixture fx("vbase-imager-partial-sector.img");
   if (!fx.haveDevice())
     SKIP("no loopback device available (needs CAP_SYS_ADMIN or passwordless sudo)");
   REQUIRE(fx.open());
@@ -1232,7 +1232,7 @@ TEST_CASE("A partial sector is absorbed and lands at the flush", "[fileops][loop
   // libarchive hands over chunks of whatever length it likes. What has to be
   // true is that the bytes are not lost: the tail is committed by
   // read-modify-write, so it is on the device once the flush has run.
-  AsyncFixture fx("rpi-imager-partial-sector.img");
+  AsyncFixture fx("vbase-imager-partial-sector.img");
   if (!fx.haveDevice())
     SKIP("no raw disk image attached (hdiutil unavailable?)");
   REQUIRE(fx.open());

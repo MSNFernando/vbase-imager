@@ -175,8 +175,8 @@ TestCase {
         // a name is parsed: an <img> in a USB product string is fetched, and
         // the fetch is the disclosure. The warning is the proof -- a label
         // that only shows the characters never asks for anything.
-        failOnWarning(/rpi-imager-marquee-beacon/)
-        const m = create({ text: "<b>SD</b> <img src=\"rpi-imager-marquee-beacon.png\"/>" })
+        failOnWarning(/vbase-imager-marquee-beacon/)
+        const m = create({ text: "<b>SD</b> <img src=\"vbase-imager-marquee-beacon.png\"/>" })
         const label = m.children[0]
         compare(label.textFormat, Text.PlainText)
         compare(label.text, m.text)

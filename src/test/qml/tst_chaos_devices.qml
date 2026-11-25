@@ -125,7 +125,7 @@ TestCase {
 
         // Markup, and a direction mark. Drawn as rich text, the image is
         // fetched; failOnWarning below says it must not be.
-        out.push({ name: "<b>Pi</b> <img src=\"rpi-imager-device-beacon.png\"/>",
+        out.push({ name: "<b>Pi</b> <img src=\"vbase-imager-device-beacon.png\"/>",
                    description: "\u202E noitpircsed <i>markup</i>",
                    tags: ["x"], architecture: "arm64" })
 
@@ -216,7 +216,7 @@ TestCase {
 
         // A board name is repository text. Drawn as rich text the image in
         // the one above is fetched, and the fetch is the disclosure.
-        failOnWarning(/rpi-imager-device-beacon/)
+        failOnWarning(/vbase-imager-device-beacon/)
         failOnWarning(/TypeError/)
         failOnWarning(/ReferenceError/)
         failOnWarning(/Binding loop/)

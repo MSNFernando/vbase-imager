@@ -15,17 +15,17 @@ src/.cache/clangd
 
 # Debian packaging
 debian/release.conf
-debian/rpi-imager/**
-debian/rpi-imager-amd64/**
-debian/rpi-imager-embedded/**
-debian/rpi-imager-cli/**
+debian/vbase-imager/**
+debian/vbase-imager-amd64/**
+debian/vbase-imager-embedded/**
+debian/vbase-imager-cli/**
 debian/.debhelper**
 debian/*.debhelper**
 debian/files
 debian/*.substvars
 debian/debhelper**
 debian/tmp
-debian/com.raspberrypi.rpi-imager.metainfo.xml
+debian/com.onecomet.vbase-imager.metainfo.xml
 
 # macOS
 .DS_Store
@@ -44,7 +44,7 @@ debian/com.raspberrypi.rpi-imager.metainfo.xml
 
 # Embedded .deb build tree (created by create-embedded.sh)
 /debroot-embedded-*
-/rpi-imager-embedded*.deb
+/vbase-imager-embedded*.deb
 
 # Qt related
 # build-qt*.sh creates these as $PWD/qt-src and $PWD/qt-build[-suffix], so they

@@ -118,7 +118,7 @@ TEST_CASE("A sync on an open file succeeds", "[winfile]")
 TEST_CASE("A file that is not there fails to open and says so", "[winfile]")
 {
     WinFile f;
-    f.setFileName(QStringLiteral("C:/nowhere-at-all/rpi-imager/absent.img"));
+    f.setFileName(QStringLiteral("C:/nowhere-at-all/vbase-imager/absent.img"));
     CHECK_FALSE(f.open(QIODevice::ReadWrite));
     CHECK_FALSE(f.isOpen());
     // Reported rather than left to the caller to infer from the false.

@@ -83,7 +83,7 @@ public:
         // exception. ~FatImage() is not called in that case, which is how the
         // FAT12 case (which asserts the constructor throws) used to leave its
         // directory behind on every run.
-        : _scratch(QStringLiteral("rpi-imager-fat"))
+        : _scratch(QStringLiteral("vbase-imager-fat"))
     {
         _path = _scratch.filePath(QStringLiteral("fat.img"));
 
@@ -216,7 +216,7 @@ TEST_CASE("FAT driver refuses a partition that is not FAT", "[fat][image]")
     // The constructor checks the 0x55AA signature and throws. Feed it a file
     // of zeroes: nothing else in the imager should be allowed to proceed on
     // the assumption that an unformatted card is a boot partition.
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-notfat"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-notfat"));
     const QString path = scratch.filePath(QStringLiteral("blank.img"));
 
     auto ops = rpi_imager::FileOperations::Create();
@@ -1119,7 +1119,7 @@ bool writeExfatBootSector(const QString &path)
 
 OpenAttempt tryOpenAs(const std::function<bool(const QString &)> &formatter, int sizeMB)
 {
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-reject"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-reject"));
     const QString path = scratch.filePath(QStringLiteral("fs.img"));
 
     OpenAttempt result;
@@ -1270,7 +1270,7 @@ TEST_CASE("FAT driver refuses an exFAT filesystem mkfs.exfat made", "[fat][image
 
 TEST_CASE("FAT driver refuses a partition of zeroes", "[fat][image]")
 {
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-zero"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-zero"));
     const QString path = scratch.filePath(QStringLiteral("zero.img"));
 
     auto ops = rpi_imager::FileOperations::Create();
@@ -1287,7 +1287,7 @@ TEST_CASE("FAT driver refuses a partition of zeroes", "[fat][image]")
 
 TEST_CASE("FAT driver refuses a signature with no filesystem behind it", "[fat][image]")
 {
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-sig"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-sig"));
     const QString path = scratch.filePath(QStringLiteral("sig.img"));
 
     // Just the boot signature and nothing else: the check that matters is the
@@ -1324,7 +1324,7 @@ TEST_CASE("FAT driver refuses a bad sector size", "[fat][image]")
 {
     REQUIRE_MKFS();
 
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-bps"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-bps"));
     const QString path = scratch.filePath(QStringLiteral("bps.img"));
 
     {
@@ -1556,7 +1556,7 @@ TEST_CASE("FAT driver refuses a circular cluster chain", "[fat][image]")
 {
     REQUIRE_MKFS();
 
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-cyc"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-cyc"));
     const QString path = scratch.filePath(QStringLiteral("cyclic.img"));
     const quint64 imageSize = 64ull * 1024 * 1024;
 
@@ -2119,7 +2119,7 @@ class TableImage
 {
 public:
     explicit TableImage(quint64 sizeBytes = 4 * 1024 * 1024)
-        : _scratch(QStringLiteral("rpi-imager-table"))
+        : _scratch(QStringLiteral("vbase-imager-table"))
     {
         _path = _scratch.filePath(QStringLiteral("table.img"));
         auto sizing = rpi_imager::FileOperations::Create();
@@ -2398,7 +2398,7 @@ namespace {
 // than assumed.
 bool fillRootDirectory(const QString &imagePath, int fileCount)
 {
-    ScopedTempDir sources(QStringLiteral("rpi-imager-fatsrc"));
+    ScopedTempDir sources(QStringLiteral("vbase-imager-fatsrc"));
     QStringList args;
     args << QStringLiteral("-i") << imagePath << QStringLiteral("-o");
     for (int i = 0; i < fileCount; ++i) {
@@ -2679,7 +2679,7 @@ bool fillSubdirectory(const QString &imagePath, int clusters)
                    QStringLiteral("::/") + kLoopDirName}))
         return false;
 
-    ScopedTempDir sources(QStringLiteral("rpi-imager-fatsub"));
+    ScopedTempDir sources(QStringLiteral("vbase-imager-fatsub"));
     const QString target = QStringLiteral("::/") + kLoopDirName + QStringLiteral("/");
 
     for (int start = 0; start < fileCount; start += kBatch) {
@@ -2916,7 +2916,7 @@ TEST_CASE("FAT driver reads a subdirectory that spans more than one cluster",
         return QByteArray("overlay body ") + QByteArray::number(i);
     };
 
-    ScopedTempDir sources(QStringLiteral("rpi-imager-overlays"));
+    ScopedTempDir sources(QStringLiteral("vbase-imager-overlays"));
     FatImage image(32, 64, [&](const QString &imagePath) {
         REQUIRE(runMtool(QStringLiteral("mmd"),
                          {QStringLiteral("-i"), imagePath, QStringLiteral("::/overlays")}));
@@ -2986,7 +2986,7 @@ TEST_CASE("FAT driver deletes from a subdirectory that spans clusters",
         return QStringLiteral("disable-peripheral-%1.dtbo").arg(i, 3, 10, QLatin1Char('0'));
     };
 
-    ScopedTempDir sources(QStringLiteral("rpi-imager-overlays-del"));
+    ScopedTempDir sources(QStringLiteral("vbase-imager-overlays-del"));
     FatImage image(32, 64, [&](const QString &imagePath) {
         REQUIRE(runMtool(QStringLiteral("mmd"),
                          {QStringLiteral("-i"), imagePath, QStringLiteral("::/overlays")}));
@@ -3135,7 +3135,7 @@ TEST_CASE("FAT driver caps a file at the clusters it owns", "[fat][image]")
 {
     REQUIRE_MKFS();
 
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-declared"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-declared"));
     const QString path = scratch.filePath(QStringLiteral("declared.img"));
     const quint64 imageSize = 64ull * 1024 * 1024;
 
@@ -3214,7 +3214,7 @@ TEST_CASE("FAT driver caps a file at the clusters it owns", "[fat][image]")
 TEST_CASE("A boot sector claiming more metadata than volume is refused",
           "[fat][image]")
 {
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-bpb"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-bpb"));
     const QString path = scratch.filePath(QStringLiteral("overclaim.img"));
 
     QByteArray disk(8 * 1024 * 1024, 0);
@@ -3269,7 +3269,7 @@ TEST_CASE("A root directory cluster below the first is refused", "[fat][image]")
     // corrupt, and the offset is worked out as (cluster - 2) * clusterSize --
     // so believing it subtracts past zero and seeks somewhere arbitrary on a
     // card that is about to be written to.
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-rootclus"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-rootclus"));
     const QString path = scratch.filePath(QStringLiteral("rootclus.img"));
 
     // Large enough to be read as FAT32: the type is decided by the cluster
@@ -3337,7 +3337,7 @@ TEST_CASE("A cluster beyond the end of the partition is refused", "[fat][image]"
     // partition, and seeking there would put a write outside the region the
     // imager was given. Checked after the multiplication, in 64 bits, so a
     // number large enough to wrap cannot slip past by wrapping.
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-farclus"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-farclus"));
     const QString path = scratch.filePath(QStringLiteral("farclus.img"));
 
     const int totalSectors = 70000;              // enough clusters to be FAT32
@@ -3402,7 +3402,7 @@ TEST_CASE("A FAT chain that points back at itself is refused", "[fat][image]")
     // A corrupt table can point a cluster back into the chain instead, and
     // without the guard the walk never ends: the imager hangs on a card that
     // is merely damaged, with no error and no way out but killing it.
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-loop"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-loop"));
     const QString path = scratch.filePath(QStringLiteral("loop.img"));
 
     const int totalSectors   = 70000;   // enough clusters to be read as FAT32
@@ -3492,7 +3492,7 @@ TEST_CASE("A FAT chain that never ends is refused rather than followed",
     //
     // A chain cannot hold more clusters than the partition has, so it is
     // refused at that point however novel each entry looks.
-    ScopedTempDir scratch(QStringLiteral("rpi-imager-longchain"));
+    ScopedTempDir scratch(QStringLiteral("vbase-imager-longchain"));
     const QString path = scratch.filePath(QStringLiteral("long.img"));
 
     const int totalSectors   = 70000;

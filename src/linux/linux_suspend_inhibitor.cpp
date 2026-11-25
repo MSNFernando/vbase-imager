@@ -96,7 +96,7 @@ ProcessScopedSuspendInhibitor::ProcessScopedSuspendInhibitor(const char *fileNam
         } else {
             rnd = static_cast<unsigned long>(getpid()) ^ static_cast<unsigned long>(attempt * 65537);
         }
-        snprintf(_fifoName, sizeof(_fifoName), "/run/rpi-imager-suspend_%lx", rnd);
+        snprintf(_fifoName, sizeof(_fifoName), "/run/vbase-imager-suspend_%lx", rnd);
 
         if (mkfifo(_fifoName, 0600) == 0)
             break; // Success — FIFO created atomically

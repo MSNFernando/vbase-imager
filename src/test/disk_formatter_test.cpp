@@ -46,7 +46,7 @@ class ScratchDir {
  public:
   ScratchDir() {
     base_ = fs::temp_directory_path() /
-            ("rpi-imager-disk-formatter-" + std::to_string(getpid()));
+            ("vbase-imager-disk-formatter-" + std::to_string(getpid()));
     std::error_code ec;
     fs::remove_all(base_, ec);
     fs::create_directories(base_, ec);

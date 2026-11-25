@@ -206,7 +206,7 @@ namespace PlatformQuirks {
 WindowIconSource windowIconSource() {
     // The theme only has the icon once a package installed it. An AppImage,
     // a build tree or an elevated run without XDG_DATA_DIRS falls back.
-    return {QStringLiteral("rpi-imager"), QStringLiteral(":/icons/rpi-imager.svg")};
+    return {QStringLiteral("vbase-imager"), QStringLiteral(":/icons/vbase-imager.svg")};
 }
 
 void applyQuirks() {
@@ -416,11 +416,11 @@ namespace {
 
             // 2. Extract bundled fallback chime to a temp file.
             //    Use a random UUID in filename to avoid symlink attacks
-            //    (rpi-imager runs as root via pkexec, so temp file security matters).
+            //    (vbase-imager runs as root via pkexec, so temp file security matters).
             QFile bundled(":/sounds/chime.wav");
             if (bundled.exists()) {
                 static QString tempPath = QDir::tempPath()
-                    + QString("/rpi-imager-chime-%1.wav").arg(
+                    + QString("/vbase-imager-chime-%1.wav").arg(
                         QUuid::createUuid().toString(QUuid::WithoutBraces));
 
                 // Remove any pre-existing file or symlink at this path
@@ -852,9 +852,9 @@ static bool generatePolkitPolicyFilename(const char* appImagePath, char* buffer,
     QByteArray pathBytes(appImagePath);
     QByteArray hash = QCryptographicHash::hash(pathBytes, QCryptographicHash::Md5).toHex();
     
-    // Create filename: com.raspberrypi.rpi-imager.appimage-HASH.policy
+    // Create filename: com.onecomet.vbase-imager.appimage-HASH.policy
     int written = std::snprintf(buffer, bufferSize, 
-        "com.raspberrypi.rpi-imager.appimage-%s.policy",
+        "com.onecomet.vbase-imager.appimage-%s.policy",
         hash.left(12).constData());  // Use first 12 chars of hash
     
     return written > 0 && static_cast<size_t>(written) < bufferSize;
@@ -1000,7 +1000,7 @@ bool hasElevationPolicyInstalled() {
 // Internal helper to remove stale polkit policy files left behind when the
 // AppImage was moved, renamed, or deleted. Called during policy installation
 // (which runs as root) so we have write access to the polkit directories.
-// Only touches files matching our naming convention (com.raspberrypi.rpi-imager.appimage-*.policy).
+// Only touches files matching our naming convention (com.onecomet.vbase-imager.appimage-*.policy).
 static void cleanupStalePolkitPolicies(const char* currentPath) {
     const QByteArray execPathTag("org.freedesktop.policykit.exec.path\">");
     const QByteArray closeTag("</annotate>");
@@ -1011,7 +1011,7 @@ static void cleanupStalePolkitPolicies(const char* currentPath) {
             continue;
 
         const QStringList policyFiles = dir.entryList(
-            QStringList() << QStringLiteral("com.raspberrypi.rpi-imager.appimage-*.policy"),
+            QStringList() << QStringLiteral("com.onecomet.vbase-imager.appimage-*.policy"),
             QDir::Files);
 
         for (const QString& filename : policyFiles) {
@@ -1115,7 +1115,7 @@ static bool installPolkitPolicyForPath(const char* appImagePath) {
     // Generate unique action ID based on path hash
     QByteArray pathBytes(appImagePath);
     QByteArray hash = QCryptographicHash::hash(pathBytes, QCryptographicHash::Md5).toHex();
-    QString actionId = QString("com.raspberrypi.rpi-imager.appimage.%1").arg(QString::fromUtf8(hash.left(12)));
+    QString actionId = QString("com.onecomet.vbase-imager.appimage.%1").arg(QString::fromUtf8(hash.left(12)));
     
     // Security: XML-escape the AppImage path to prevent XML injection attacks
     // An attacker-controlled path like "</annotate><evil>..." could break the XML
@@ -1133,7 +1133,7 @@ static bool installPolkitPolicyForPath(const char* appImagePath) {
         "  <action id=\"%1\">\n"
         "    <description>Run vBase Imager</description>\n"
         "    <message>Authentication is required to run vBase Imager</message>\n"
-        "    <icon_name>rpi-imager</icon_name>\n"
+        "    <icon_name>vbase-imager</icon_name>\n"
         "    <defaults>\n"
         "      <allow_any>auth_admin</allow_any>\n"
         "      <allow_inactive>auth_admin</allow_inactive>\n"
@@ -1967,7 +1967,7 @@ void clearAppImageEnvironment() {
 
 bool registerUriScheme() {
     // $APPIMAGE (set by the AppImage runtime) or the resolved /proc/self/exe.
-    // %u makes the OS pass the rpi-imager:// callback URL as an argument.
+    // %u makes the OS pass the vbase-imager:// callback URL as an argument.
     const char* bundle = getBundlePath();
     if (!bundle || bundle[0] == '\0') {
         qWarning() << "registerUriScheme: could not resolve executable path";
@@ -1982,15 +1982,15 @@ bool registerUriScheme() {
         "Type=Application\n"
         "Name=vBase Imager\n"
         "Exec=%1 %u\n"
-        "Icon=rpi-imager\n"
+        "Icon=vbase-imager\n"
         "Terminal=false\n"
         "NoDisplay=true\n"
-        "MimeType=x-scheme-handler/rpi-imager;\n").arg(execPath);
+        "MimeType=x-scheme-handler/vbase-imager;\n").arg(execPath);
     const QByteArray desktopBytes = desktopContents.toUtf8();
 
     const QString appsDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
                             + QStringLiteral("/applications");
-    const QString desktopName = QStringLiteral("com.raspberrypi.rpi-imager-uri-handler.desktop");
+    const QString desktopName = QStringLiteral("vbase-imager-uri-handler.desktop");
     const QString desktopPath = appsDir + QLatin1Char('/') + desktopName;
     PlatformQuirks::InvokingUserFsScope asUser;
 
@@ -2041,9 +2041,9 @@ bool registerUriScheme() {
     runTool(QStringLiteral("update-desktop-database"), QStringList() << appsDir);
     runTool(QStringLiteral("xdg-mime"),
             QStringList() << QStringLiteral("default") << desktopName
-                          << QStringLiteral("x-scheme-handler/rpi-imager"));
+                          << QStringLiteral("x-scheme-handler/vbase-imager"));
 
-    qDebug() << "Registered rpi-imager:// scheme handler at" << desktopPath;
+    qDebug() << "Registered vbase-imager:// scheme handler at" << desktopPath;
     return true;
 }
 

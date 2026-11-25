@@ -123,8 +123,8 @@ TEST_CASE("The user agent is shared by every fetch path", "[curlconfig]")
     // from a scraper.
     CHECK_FALSE(cfg.userAgent().isEmpty());
 
-    cfg.setUserAgent(QByteArray("rpi-imager-test/1.0"));
-    CHECK(cfg.userAgent() == QByteArray("rpi-imager-test/1.0"));
+    cfg.setUserAgent(QByteArray("vbase-imager-test/1.0"));
+    CHECK(cfg.userAgent() == QByteArray("vbase-imager-test/1.0"));
 }
 
 TEST_CASE("IPv4-only mode can be turned on and off", "[curlconfig]")
@@ -224,7 +224,7 @@ TEST_CASE("The user agent is actually sent", "[curlconfig]")
     auto &cfg = CurlNetworkConfig::instance();
     CurlNetworkConfig::ensureInitialized();
     cfg.setProxy(QByteArray());
-    cfg.setUserAgent(QByteArray("rpi-imager-test/1.0"));
+    cfg.setUserAgent(QByteArray("vbase-imager-test/1.0"));
 
     // Not an assertion on the server side -- it discards headers -- but the
     // fetch has to still work with the agent applied, and a malformed one

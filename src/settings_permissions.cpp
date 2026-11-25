@@ -250,7 +250,7 @@ int restoreUserOwnership(const QString& path)
 //
 // Imager elevates itself to write to a disk and applyQuirks() then points
 // HOME and the XDG directories at the invoking user, so from that point
-// root is writing into somebody else's home: the rpi-imager:// handler,
+// root is writing into somebody else's home: the vbase-imager:// handler,
 // the mimeinfo.cache and mimeapps.list that update-desktop-database and
 // xdg-mime rewrite, and the OS list cache. Left root-owned, the two MIME
 // files stop *any* application registering a file association, and a
@@ -268,7 +268,7 @@ void handBackUserFiles()
     // Named individually rather than sweeping the applications directory:
     // other applications' entries live there too and are not ours to touch.
     for (const QString& path : {
-             applications + QStringLiteral("/com.raspberrypi.rpi-imager-uri-handler.desktop"),
+             applications + QStringLiteral("/vbase-imager-uri-handler.desktop"),
              applications + QStringLiteral("/mimeinfo.cache"),
              config + QStringLiteral("/mimeapps.list"),
              QSettings().fileName(),

@@ -11,7 +11,7 @@ else()
     # Set all required bundle properties
     set(MACOSX_BUNDLE_BUNDLE_NAME "${APP_NAME}")
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.raspberrypi.rpi-imager")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.onecomet.vbase-imager")
     set(MACOSX_BUNDLE_ICON_FILE "AppIcon")
     string(TIMESTAMP CURRENT_YEAR "%Y")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2020-${CURRENT_YEAR} Raspberry Pi Ltd")
@@ -57,7 +57,7 @@ else()
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E echo "Cleaning up previous macOS DMG files..."
     COMMAND ${CMAKE_COMMAND} -E remove -f "${DMG_PATH}"
-    COMMAND sh -c "rm -f '${CMAKE_BINARY_DIR}/${APP_NAME}'-*.dmg"
+    COMMAND sh -c "rm -f '${CMAKE_BINARY_DIR}/${PROJECT_NAME}'-*.dmg"
     COMMENT "Cleaning previous macOS build artifacts"
 )
 
@@ -214,7 +214,7 @@ if(EXISTS "${PRECOMPILED_ASSETS_CAR}" AND NOT BUILD_CLI_ONLY)
     )
 endif()
 
-# vBase Imager ships only the .icns (generated from src/linux/icon/rpi-imager.svg);
+# vBase Imager ships only the .icns (generated from src/linux/icon/vbase-imager.svg);
 # without an Assets.car, install it under the name CFBundleIconFile expects.
 if(NOT EXISTS "${PRECOMPILED_ASSETS_CAR}" AND EXISTS "${PRECOMPILED_ICNS}" AND NOT BUILD_CLI_ONLY)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -290,6 +290,7 @@ else()
             "-DVERSION_VARS_FILE=${IMAGER_VERSION_VARS}"
             "-DAPP_NAME=${APP_NAME}"
             "-DAPP_BUNDLE_PATH=${APP_BUNDLE_PATH}"
+            "-DFILE_STEM=${PROJECT_NAME}"
             "-DBUILD_DIR=${CMAKE_BINARY_DIR}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CreateUnsignedDMG.cmake"
         DEPENDS ${PROJECT_NAME}

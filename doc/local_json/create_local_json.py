@@ -10,7 +10,7 @@ import urllib.request
 from collections import OrderedDict
 
 DEFAULT_REPO_URL = "https://downloads.raspberrypi.com/os_list_imagingutility_v4.json"
-DEFAULT_OUTPUT_JSON_FILE = "os_list_local.rpi-imager-manifest"
+DEFAULT_OUTPUT_JSON_FILE = "os_list_local.vbase-imager-manifest"
 CACHE_DIR = "cache"
 ICONS_DIR = os.path.join(CACHE_DIR, "icons")
 CHUNK_SIZE = 1024 * 1024 # read files in 1MB chunks

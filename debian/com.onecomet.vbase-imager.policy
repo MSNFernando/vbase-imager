@@ -7,16 +7,16 @@
   <vendor>vBase</vendor>
   <vendor_url>https://github.com/MSNFernando/vbase-imager</vendor_url>
 
-  <action id="com.raspberrypi.rpi-imager.run">
+  <action id="com.onecomet.vbase-imager.run">
     <description>Run vBase Imager</description>
     <message>Authentication is required to run vBase Imager</message>
-    <icon_name>rpi-imager</icon_name>
+    <icon_name>vbase-imager</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
       <allow_active>auth_admin</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/rpi-imager</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/vbase-imager</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 

@@ -338,7 +338,7 @@ TEST_CASE("CacheManager verification of a missing file fails rather than hangs",
 
     const QByteArray hash = hashOf("never written");
     manager.setCustomCacheFile(
-        QStringLiteral("/nonexistent-rpi-imager-dir/gone.img"), hash);
+        QStringLiteral("/nonexistent-vbase-imager-dir/gone.img"), hash);
 
     rpi_test::SignalLog completed(&manager, &CacheManager::cacheVerificationComplete);
     manager.startVerification(hash);
@@ -1093,7 +1093,7 @@ TEST_CASE("A custom cache file is used rather than the default one",
     clearCacheDir();
     CacheManager manager;
     const QString chosen = QDir::temp().filePath(
-        QStringLiteral("rpi-imager-chosen-cache.img"));
+        QStringLiteral("vbase-imager-chosen-cache.img"));
     manager.setCustomCacheFile(chosen, QByteArray("some-hash"));
     reportDiskSpace(manager, 200LL * 1024 * 1024 * 1024);
 

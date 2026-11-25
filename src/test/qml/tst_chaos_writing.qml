@@ -122,7 +122,7 @@ TestCase {
             "",
             "Mounting the partition",
             "Unmounting <b>/dev/sda1</b>",
-            "<img src='http://rpi-imager-chaos-beacon/x.png'>",
+            "<img src='http://vbase-imager-chaos-beacon/x.png'>",
             repeat("status ", 700),
             "Checking the cached image",
             "100% complete",
@@ -171,7 +171,7 @@ TestCase {
 
         // A status line is somebody else's string. Drawn as rich text, the
         // <img> above is fetched, and the fetch is the disclosure.
-        failOnWarning(/rpi-imager-chaos-beacon/)
+        failOnWarning(/vbase-imager-chaos-beacon/)
         failOnWarning(/TypeError/)
         failOnWarning(/ReferenceError/)
         failOnWarning(/Binding loop/)

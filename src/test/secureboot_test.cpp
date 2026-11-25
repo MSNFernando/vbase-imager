@@ -58,7 +58,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-secureboot-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-secureboot-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);
@@ -160,7 +160,7 @@ TEST_CASE("SecureBoot hashes a file larger than one read", "[secureboot]")
 TEST_CASE("SecureBoot reports a missing file rather than a hash of nothing", "[secureboot]")
 {
     const QByteArray digest =
-        SecureBoot::sha256File(QStringLiteral("/nonexistent-rpi-imager/no-such-file.bin"));
+        SecureBoot::sha256File(QStringLiteral("/nonexistent-vbase-imager/no-such-file.bin"));
 
     // The dangerous outcome would be the digest of an empty buffer, which is
     // a real-looking hash of the wrong thing.

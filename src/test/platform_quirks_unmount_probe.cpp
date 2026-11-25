@@ -27,10 +27,10 @@
 
 namespace {
 
-const char *kRoot      = "/tmp/rpi-imager-unmount-probe";
-const char *kDisk      = "/tmp/rpi-imager-unmount-probe/disk";
-const char *kPartition = "/tmp/rpi-imager-unmount-probe/disk1";
-const char *kMountDir  = "/tmp/rpi-imager-unmount-probe/mnt";
+const char *kRoot      = "/tmp/vbase-imager-unmount-probe";
+const char *kDisk      = "/tmp/vbase-imager-unmount-probe/disk";
+const char *kPartition = "/tmp/vbase-imager-unmount-probe/disk1";
+const char *kMountDir  = "/tmp/vbase-imager-unmount-probe/mnt";
 
 // Count the /proc/mounts entries whose source is our fake partition.
 int mountsForPartition()
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     // A device path that is not there at all: reported rather than treated
     // as nothing to do, because writing to it would be next.
     const auto missing = PlatformQuirks::unmountDisk(
-        QStringLiteral("/tmp/rpi-imager-unmount-probe/not-a-disk"));
+        QStringLiteral("/tmp/vbase-imager-unmount-probe/not-a-disk"));
     std::printf("MISSING_RESULT=%d\n", static_cast<int>(missing));
 
     // And a directory, which is the shape of a mistake in the caller.

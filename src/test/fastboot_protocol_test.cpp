@@ -1289,7 +1289,7 @@ TEST_CASE("Customisation pattern: cloud-init meta-data + user-data + network-con
     std::atomic<bool> cancelled{false};
 
     // Write meta-data
-    QByteArray instanceId = "rpi-imager-1234567890";
+    QByteArray instanceId = "vbase-imager-1234567890";
     QByteArray metadata = "instance-id: " + instanceId + "\n";
     auto metadataSpan = std::span<const uint8_t>(
         reinterpret_cast<const uint8_t*>(metadata.constData()),

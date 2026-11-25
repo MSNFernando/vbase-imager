@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Tiny Windows callback URL relay for rpi-imager
+// Tiny Windows callback URL relay for vbase-imager
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -15,7 +15,7 @@
 #define RPI_IMAGER_PORT 49629
 #endif
 #ifndef RPI_IMAGER_EXE_NAME
-#define RPI_IMAGER_EXE_NAME L"rpi-imager.exe"
+#define RPI_IMAGER_EXE_NAME L"vbase-imager.exe"
 #endif
 // If nonzero: on IPC failure, start Imager with the URL as positional arg.
 #ifndef RPI_IMAGER_START_ON_FAIL
@@ -89,7 +89,7 @@ static int send_url_over_tcp_utf8(const wchar_t* urlW)
 
 static void start_imager_with_url(const wchar_t* urlW)
 {
-    // Launch {app}\rpi-imager.exe "<url>"
+    // Launch {app}\vbase-imager.exe "<url>"
     // Working dir = directory containing this relay
     wchar_t exePath[MAX_PATH];
     DWORD pathLen = GetModuleFileNameW(nullptr, exePath, MAX_PATH);
@@ -115,8 +115,8 @@ static void start_imager_with_url(const wchar_t* urlW)
         return; // File doesn't exist or is a directory
     }
 
-    // Build command line: "rpi-imager.exe" "<url>"
-    // Use ShellExecuteEx to respect UAC manifest of rpi-imager.exe
+    // Build command line: "vbase-imager.exe" "<url>"
+    // Use ShellExecuteEx to respect UAC manifest of vbase-imager.exe
     SHELLEXECUTEINFOW sei{};
     sei.cbSize = sizeof(sei);
     sei.fMask = SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI; // No error UI on failure

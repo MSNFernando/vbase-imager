@@ -486,7 +486,7 @@ TEST_CASE("launchDetached reports exec success and failure", "[platformquirks][l
     // A program that cannot be exec'd must report failure rather than masking
     // it behind the double-fork. This is what lets ImageWriter::openUrl fall
     // back to QDesktopServices when xdg-open is missing or unrunnable.
-    CHECK(PlatformQuirks::launchDetached("rpi-imager-nonexistent-binary-xyz",
+    CHECK(PlatformQuirks::launchDetached("vbase-imager-nonexistent-binary-xyz",
                                          QStringList()) == false);
     CHECK(PlatformQuirks::launchDetached("/nonexistent/path/to/binary",
                                          QStringList()) == false);
@@ -529,7 +529,7 @@ TEST_CASE("A program named without a path is looked for in fixed directories, "
     REQUIRE(tmp.isValid());
 
     const QString marker = tmp.filePath(QStringLiteral("it-ran"));
-    const QString planted = tmp.filePath(QStringLiteral("rpi-imager-hijack-probe"));
+    const QString planted = tmp.filePath(QStringLiteral("vbase-imager-hijack-probe"));
     REQUIRE(writeExecutable(planted,
                             "#!/bin/sh\ntouch \"" + marker.toUtf8() + "\"\n"));
 
@@ -538,7 +538,7 @@ TEST_CASE("A program named without a path is looked for in fixed directories, "
     qputenv("PATH", tmp.path().toUtf8() + ":" + oldPath);
 
     const bool launched = PlatformQuirks::launchDetached(
-        QStringLiteral("rpi-imager-hijack-probe"), QStringList());
+        QStringLiteral("vbase-imager-hijack-probe"), QStringList());
 
     qputenv("PATH", oldPath);
 
@@ -597,7 +597,7 @@ TEST_CASE("Arguments reach the program one element each",
     CHECK(got == args);
 }
 
-TEST_CASE("registerUriScheme writes the rpi-imager:// desktop entry", "[platformquirks][linux]") {
+TEST_CASE("registerUriScheme writes the vbase-imager:// desktop entry", "[platformquirks][linux]") {
     // Redirect the XDG data/config dirs to a temp location so the test neither
     // pollutes nor depends on the real user environment (any update-desktop-
     // database / xdg-mime side effects land in the temp dirs).
@@ -614,7 +614,7 @@ TEST_CASE("registerUriScheme writes the rpi-imager:// desktop entry", "[platform
     CHECK(PlatformQuirks::registerUriScheme() == true);
 
     const QString desktopPath = dataHome.path()
-        + "/applications/com.raspberrypi.rpi-imager-uri-handler.desktop";
+        + "/applications/vbase-imager-uri-handler.desktop";
     QFile f(desktopPath);
     REQUIRE(f.exists());
     REQUIRE(f.open(QIODevice::ReadOnly));
@@ -623,7 +623,7 @@ TEST_CASE("registerUriScheme writes the rpi-imager:// desktop entry", "[platform
 
     const QString contents = QString::fromUtf8(firstWrite);
     // The entry must claim the scheme and point Exec at this executable with %u.
-    CHECK(contents.contains("MimeType=x-scheme-handler/rpi-imager;"));
+    CHECK(contents.contains("MimeType=x-scheme-handler/vbase-imager;"));
     CHECK(contents.contains("Exec="));
     CHECK(contents.contains("%u"));
     CHECK(contents.contains("NoDisplay=true"));
@@ -702,7 +702,7 @@ TEST_CASE("registerUriScheme is safe to call on macOS", "[platformquirks][macos]
 #ifdef Q_OS_WIN
 
 TEST_CASE("registerUriScheme is a runtime no-op on Windows", "[platformquirks][windows]") {
-    // The rpi-imager:// association is written to the registry by the installer,
+    // The vbase-imager:// association is written to the registry by the installer,
     // so the runtime call has nothing to do and reports success.
     CHECK(PlatformQuirks::registerUriScheme() == true);
 }
@@ -898,7 +898,7 @@ public:
     MountedLoopDisk()
     {
         const QString id = QUuid::createUuid().toString(QUuid::WithoutBraces).left(8);
-        _dir = QDir::temp().filePath(QStringLiteral("rpi-imager-um-%1").arg(id));
+        _dir = QDir::temp().filePath(QStringLiteral("vbase-imager-um-%1").arg(id));
         QDir().mkpath(_dir);
         _mountPoint = QDir(_dir).filePath(QStringLiteral("mnt"));
         QDir().mkpath(_mountPoint);
@@ -1357,11 +1357,11 @@ TEST_CASE("XML escaping survives a round trip through a parser",
 {
     // Every one of these appears in real filesystem paths.
     const QStringList inputs = {
-        QStringLiteral("/home/user/Applications/rpi-imager.AppImage"),
-        QStringLiteral("/home/user/R&D/rpi-imager.AppImage"),
-        QStringLiteral("/home/user/\"quoted\"/rpi-imager.AppImage"),
-        QStringLiteral("/home/user/it's mine/rpi-imager.AppImage"),
-        QStringLiteral("/home/user/<angle>/rpi-imager.AppImage"),
+        QStringLiteral("/home/user/Applications/vbase-imager.AppImage"),
+        QStringLiteral("/home/user/R&D/vbase-imager.AppImage"),
+        QStringLiteral("/home/user/\"quoted\"/vbase-imager.AppImage"),
+        QStringLiteral("/home/user/it's mine/vbase-imager.AppImage"),
+        QStringLiteral("/home/user/<angle>/vbase-imager.AppImage"),
         QStringLiteral("/tmp/a&b<c>d\"e'f"),
         QStringLiteral(""),
     };
@@ -1409,11 +1409,11 @@ TEST_CASE("A policy filename is stable, unique and stays in its directory",
     char a[128] = {0}, b[128] = {0}, again[128] = {0};
 
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/user/Apps/rpi-imager.AppImage", a, sizeof(a)));
+        "/home/user/Apps/vbase-imager.AppImage", a, sizeof(a)));
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/opt/rpi-imager.AppImage", b, sizeof(b)));
+        "/opt/vbase-imager.AppImage", b, sizeof(b)));
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/user/Apps/rpi-imager.AppImage", again, sizeof(again)));
+        "/home/user/Apps/vbase-imager.AppImage", again, sizeof(again)));
 
     const QString nameA = QString::fromLatin1(a);
     INFO("A: " << nameA.toStdString() << "  B: " << b);
@@ -1425,7 +1425,7 @@ TEST_CASE("A policy filename is stable, unique and stays in its directory",
     // Two AppImages in different places do not share one.
     CHECK(nameA != QString::fromLatin1(b));
 
-    CHECK(nameA.startsWith(QStringLiteral("com.raspberrypi.rpi-imager.appimage-")));
+    CHECK(nameA.startsWith(QStringLiteral("com.onecomet.vbase-imager.appimage-")));
     CHECK(nameA.endsWith(QStringLiteral(".policy")));
 
     // It is joined onto a directory, so anything that looks like a path
@@ -1645,14 +1645,14 @@ TEST_CASE("A path survives the policy document unchanged", "[platformquirks][pol
     // third is the one that matters: unescaped it would close the annotation
     // and add a rule of its own to a file that grants root.
     const QStringList paths = {
-        QStringLiteral("/home/pi/Downloads/rpi-imager.AppImage"),
+        QStringLiteral("/home/pi/Downloads/vbase-imager.AppImage"),
         QStringLiteral("/home/pi/rpi & imager.AppImage"),
         QStringLiteral("/tmp/x</annotate><allow_any>yes</allow_any><annotate key=\"y\">"),
-        QStringLiteral("/home/o'brien/rpi-imager.AppImage"),
-        QStringLiteral("/home/pi/\"quoted\"/rpi-imager.AppImage"),
-        QStringLiteral("/home/pi/a<b>c/rpi-imager.AppImage"),
-        QStringLiteral("/home/山田/rpi-imager.AppImage"),
-        QStringLiteral("/home/pi/tab\there/rpi-imager.AppImage"),
+        QStringLiteral("/home/o'brien/vbase-imager.AppImage"),
+        QStringLiteral("/home/pi/\"quoted\"/vbase-imager.AppImage"),
+        QStringLiteral("/home/pi/a<b>c/vbase-imager.AppImage"),
+        QStringLiteral("/home/山田/vbase-imager.AppImage"),
+        QStringLiteral("/home/pi/tab\there/vbase-imager.AppImage"),
     };
 
     for (const QString& raw : paths) {
@@ -1692,7 +1692,7 @@ TEST_CASE("Ordinary text is not disturbed", "[platformquirks][polkit]")
     // The common case, stated so an over-eager escape shows up: a policy file
     // full of entities for characters that never needed them is still valid
     // XML, so nothing else here would notice.
-    const QString plain = QStringLiteral("/usr/local/bin/rpi-imager-2.0.1");
+    const QString plain = QStringLiteral("/usr/local/bin/vbase-imager-2.0.1");
     CHECK(PlatformQuirks::TestAPI::xmlEscape(plain) == plain);
 }
 
@@ -1704,9 +1704,9 @@ TEST_CASE("A policy filename cannot escape the actions directory",
     // else entirely -- with root's permissions, since the installer runs
     // elevated.
     const char* const paths[] = {
-        "/home/pi/rpi-imager.AppImage",
+        "/home/pi/vbase-imager.AppImage",
         "/home/pi/../../etc/passwd",
-        "/home/pi/a/b/c/d/e/f/rpi-imager.AppImage",
+        "/home/pi/a/b/c/d/e/f/vbase-imager.AppImage",
         "relative/path.AppImage",
         "/home/pi/rpi imager (1).AppImage",
     };
@@ -1721,7 +1721,7 @@ TEST_CASE("A policy filename cannot escape the actions directory",
         INFO("name: " << name.toStdString());
         CHECK_FALSE(name.contains(QLatin1Char('/')));
         CHECK_FALSE(name.contains(QStringLiteral("..")));
-        CHECK(name.startsWith(QStringLiteral("com.raspberrypi.rpi-imager.appimage-")));
+        CHECK(name.startsWith(QStringLiteral("com.onecomet.vbase-imager.appimage-")));
         CHECK(name.endsWith(QStringLiteral(".policy")));
     }
 }
@@ -1735,9 +1735,9 @@ TEST_CASE("Two AppImages in different places get different policies",
     char a[128] = {};
     char b[128] = {};
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/pi/Downloads/rpi-imager.AppImage", a, sizeof(a)));
+        "/home/pi/Downloads/vbase-imager.AppImage", a, sizeof(a)));
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/opt/rpi-imager/rpi-imager.AppImage", b, sizeof(b)));
+        "/opt/vbase-imager/vbase-imager.AppImage", b, sizeof(b)));
 
     CHECK(QString::fromUtf8(a) != QString::fromUtf8(b));
 }
@@ -1752,9 +1752,9 @@ TEST_CASE("The same AppImage always gets the same policy name",
     char first[128] = {};
     char second[128] = {};
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/pi/rpi-imager.AppImage", first, sizeof(first)));
+        "/home/pi/vbase-imager.AppImage", first, sizeof(first)));
     REQUIRE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/pi/rpi-imager.AppImage", second, sizeof(second)));
+        "/home/pi/vbase-imager.AppImage", second, sizeof(second)));
 
     CHECK(QString::fromUtf8(first) == QString::fromUtf8(second));
 }
@@ -1766,14 +1766,14 @@ TEST_CASE("A filename is refused rather than truncated", "[platformquirks][polki
     // silently. Refusing is the only safe answer.
     char small[64] = {};
     CHECK_FALSE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/pi/rpi-imager.AppImage", small, 32));
+        "/home/pi/vbase-imager.AppImage", small, 32));
 
     // And the arguments it cannot work with at all.
     char buffer[128] = {};
     CHECK_FALSE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
         nullptr, buffer, sizeof(buffer)));
     CHECK_FALSE(PlatformQuirks::TestAPI::generatePolkitPolicyFilename(
-        "/home/pi/rpi-imager.AppImage", nullptr, sizeof(buffer)));
+        "/home/pi/vbase-imager.AppImage", nullptr, sizeof(buffer)));
 }
 #endif // Q_OS_LINUX
 
@@ -2171,9 +2171,9 @@ TEST_CASE("No GTK settings file is not a request for reduced motion",
 
 #ifdef Q_OS_LINUX
 // ══════════════════════════════════════════════════════════════
-// The rpi-imager:// handler, after the first time
+// The vbase-imager:// handler, after the first time
 //
-// The desktop entry is what makes a rpi-imager:// link open Imager with the
+// The desktop entry is what makes a vbase-imager:// link open Imager with the
 // link as an argument. Writing it fresh is covered above. What was not is
 // everything after that: an entry left by an older install at a path the
 // executable has moved away from, and a re-registration that cannot be
@@ -2208,7 +2208,7 @@ private:
 QString uriHandlerPath(const QString& dataHome)
 {
     return dataHome
-        + QStringLiteral("/applications/com.raspberrypi.rpi-imager-uri-handler.desktop");
+        + QStringLiteral("/applications/vbase-imager-uri-handler.desktop");
 }
 
 QByteArray readAll(const QString& path)
@@ -2240,8 +2240,8 @@ TEST_CASE("A handler left by an older install is replaced", "[platformquirks][ur
             "[Desktop Entry]\n"
             "Type=Application\n"
             "Name=Raspberry Pi Imager\n"
-            "Exec=/opt/some-old-location/rpi-imager.AppImage %u\n"
-            "MimeType=x-scheme-handler/rpi-imager;\n");
+            "Exec=/opt/some-old-location/vbase-imager.AppImage %u\n"
+            "MimeType=x-scheme-handler/vbase-imager;\n");
     }
 
     CHECK(PlatformQuirks::registerUriScheme() == true);
@@ -2252,7 +2252,7 @@ TEST_CASE("A handler left by an older install is replaced", "[platformquirks][ur
     // Naming this executable, and still passing the URL on.
     CHECK(written.contains(QString::fromUtf8(PlatformQuirks::getBundlePath())));
     CHECK(written.contains(QStringLiteral("%u")));
-    CHECK(written.contains(QStringLiteral("MimeType=x-scheme-handler/rpi-imager;")));
+    CHECK(written.contains(QStringLiteral("MimeType=x-scheme-handler/vbase-imager;")));
 }
 
 TEST_CASE("A registration that cannot be written keeps the entry that worked",
@@ -2315,7 +2315,7 @@ TEST_CASE("A successful registration leaves no half-written files behind",
     REQUIRE(PlatformQuirks::registerUriScheme() == true);
 
     const QString entry =
-        QStringLiteral("com.raspberrypi.rpi-imager-uri-handler.desktop");
+        QStringLiteral("vbase-imager-uri-handler.desktop");
     const QString appsDir = QFileInfo(uriHandlerPath(dataHome.path())).path();
     const QStringList left = QDir(appsDir).entryList(QDir::Files | QDir::Hidden);
     INFO(left.join(QStringLiteral(", ")).toStdString());
@@ -3591,7 +3591,7 @@ QByteArray policyGranting(const QString& execPath)
     return QStringLiteral(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         "<policyconfig>\n"
-        "  <action id=\"com.raspberrypi.rpi-imager.pkexec.run\">\n"
+        "  <action id=\"com.onecomet.vbase-imager.pkexec.run\">\n"
         "    <message>Authentication is required to write to a disk</message>\n"
         "    <defaults><allow_any>auth_admin</allow_any></defaults>\n"
         "    <annotate key=\"org.freedesktop.policykit.exec.path\">%1</annotate>\n"
@@ -3675,7 +3675,7 @@ TEST_CASE("A policy naming this binary is found", "[platformquirks][policy]")
     REQUIRE(etc.isValid());
     REQUIRE(usr.isValid());
     REQUIRE(writePolicyFile(etc.path() + QStringLiteral("/actions"),
-                            QStringLiteral("com.raspberrypi.rpi-imager.appimage-abc.policy"),
+                            QStringLiteral("com.onecomet.vbase-imager.appimage-abc.policy"),
                             policyGranting(bundle)));
 
     CHECK(policyInstalledWith(etc.path(), usr.path()) == 1);
@@ -3697,7 +3697,7 @@ TEST_CASE("The vendor directory is searched too", "[platformquirks][policy]")
     REQUIRE(usr.isValid());
     REQUIRE(QDir().mkpath(etc.path() + QStringLiteral("/actions")));
     REQUIRE(writePolicyFile(usr.path(),
-                            QStringLiteral("com.raspberrypi.rpi-imager.appimage-def.policy"),
+                            QStringLiteral("com.onecomet.vbase-imager.appimage-def.policy"),
                             policyGranting(bundle)));
 
     CHECK(policyInstalledWith(etc.path(), usr.path()) == 1);
@@ -3716,8 +3716,8 @@ TEST_CASE("Another AppImage's policy is not taken for ours",
     REQUIRE(etc.isValid());
     REQUIRE(usr.isValid());
     REQUIRE(writePolicyFile(etc.path() + QStringLiteral("/actions"),
-                            QStringLiteral("com.raspberrypi.rpi-imager.appimage-old.policy"),
-                            policyGranting(QStringLiteral("/opt/elsewhere/rpi-imager.AppImage"))));
+                            QStringLiteral("com.onecomet.vbase-imager.appimage-old.policy"),
+                            policyGranting(QStringLiteral("/opt/elsewhere/vbase-imager.AppImage"))));
 
     CHECK(policyInstalledWith(etc.path(), usr.path()) == 0);
 }
@@ -4004,7 +4004,7 @@ TEST_CASE("Installing a policy writes one naming this binary, and it is then fou
     const QStringList written = policyFilesIn(actions);
     REQUIRE(written.size() == 1);
     CHECK(written.first().startsWith(
-        QStringLiteral("com.raspberrypi.rpi-imager.appimage-")));
+        QStringLiteral("com.onecomet.vbase-imager.appimage-")));
 
     // And the round trip: what was written is what the check reads back.
     const QString check = runProbeInPolkitNamespace(QStringLiteral("policy"),
@@ -4026,15 +4026,15 @@ TEST_CASE("Installing sweeps away a policy for a binary that is gone",
     REQUIRE(usr.isValid());
     const QString actions = etc.path() + QStringLiteral("/actions");
     REQUIRE(writePolicyFile(actions,
-                            QStringLiteral("com.raspberrypi.rpi-imager.appimage-gone.policy"),
-                            policyGranting(QStringLiteral("/opt/deleted-appimage/rpi-imager.AppImage"))));
+                            QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy"),
+                            policyGranting(QStringLiteral("/opt/deleted-appimage/vbase-imager.AppImage"))));
 
     runProbeInPolkitNamespace(QStringLiteral("install"), etc.path(), usr.path());
 
     const QStringList left = policyFilesIn(actions);
     INFO(left.join(QStringLiteral(", ")).toStdString());
     CHECK_FALSE(left.contains(
-        QStringLiteral("com.raspberrypi.rpi-imager.appimage-gone.policy")));
+        QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy")));
 }
 
 TEST_CASE("Installing leaves alone a policy for a binary that is still there",
@@ -4051,7 +4051,7 @@ TEST_CASE("Installing leaves alone a policy for a binary that is still there",
     const QString actions = etc.path() + QStringLiteral("/actions");
     // /bin/sh stands in for the other copy: a path that certainly exists.
     REQUIRE(writePolicyFile(actions,
-                            QStringLiteral("com.raspberrypi.rpi-imager.appimage-other.policy"),
+                            QStringLiteral("com.onecomet.vbase-imager.appimage-other.policy"),
                             policyGranting(QStringLiteral("/bin/sh"))));
 
     runProbeInPolkitNamespace(QStringLiteral("install"), etc.path(), usr.path());
@@ -4059,7 +4059,7 @@ TEST_CASE("Installing leaves alone a policy for a binary that is still there",
     const QStringList left = policyFilesIn(actions);
     INFO(left.join(QStringLiteral(", ")).toStdString());
     CHECK(left.contains(
-        QStringLiteral("com.raspberrypi.rpi-imager.appimage-other.policy")));
+        QStringLiteral("com.onecomet.vbase-imager.appimage-other.policy")));
 }
 
 TEST_CASE("Installing does not touch somebody else's policy",
@@ -4379,7 +4379,7 @@ struct ElevationFixture {
     {
         if (!scratch.isValid())
             return false;
-        bundle = scratch.filePath(QStringLiteral("rpi-imager.AppImage"));
+        bundle = scratch.filePath(QStringLiteral("vbase-imager.AppImage"));
         pkexec = scratch.filePath(QStringLiteral("pkexec"));
         etcRoot = scratch.filePath(QStringLiteral("etc"));
         usrActions = scratch.filePath(QStringLiteral("usr-actions"));
@@ -4827,7 +4827,7 @@ PkexecRun runWithPkexec(const QStringList &probeArgs, int pkexecExit,
     if (!scratch.isValid())
         return result;
 
-    const QString bundle = scratch.filePath(QStringLiteral("rpi-imager.AppImage"));
+    const QString bundle = scratch.filePath(QStringLiteral("vbase-imager.AppImage"));
     const QString pkexec = scratch.filePath(QStringLiteral("pkexec"));
     {
         QFile f(bundle);
@@ -4893,7 +4893,7 @@ TEST_CASE("Installing the policy asks pkexec for the flag that installs it",
     CHECK(run.args.contains(QStringLiteral("--disable-internal-agent")));
     // Re-runs *this* binary, and tells it what to do when it gets there.
     CHECK(run.args.contains(QStringLiteral("--install-elevation-policy")));
-    CHECK(run.args.at(run.args.size() - 2).endsWith(QStringLiteral("rpi-imager.AppImage")));
+    CHECK(run.args.at(run.args.size() - 2).endsWith(QStringLiteral("vbase-imager.AppImage")));
 }
 
 TEST_CASE("A policy install the user declined is reported as declined",
@@ -4996,16 +4996,16 @@ TEST_CASE("The program run as root is the resolved bundle path",
     // arguments start at argv[1]. Nothing the caller supplies can become the
     // program.
     const QStringList cmd = buildElevationCommand(
-        QStringLiteral("/usr/bin/rpi-imager"),
+        QStringLiteral("/usr/bin/vbase-imager"),
         QStringList{QStringLiteral("--repo"), QStringLiteral("https://example.invalid/os.json")});
 
     REQUIRE(cmd.size() == 5);
     CHECK(cmd[0] == QStringLiteral("/usr/bin/pkexec"));
-    CHECK(cmd[2] == QStringLiteral("/usr/bin/rpi-imager"));
+    CHECK(cmd[2] == QStringLiteral("/usr/bin/vbase-imager"));
 
     // The bundle path is at the program position, not merely present
     // somewhere: pkexec runs cmd[2] once its own options are consumed.
-    const int programIndex = cmd.indexOf(QStringLiteral("/usr/bin/rpi-imager"));
+    const int programIndex = cmd.indexOf(QStringLiteral("/usr/bin/vbase-imager"));
     CHECK(programIndex == 2);
 }
 
@@ -5020,11 +5020,11 @@ TEST_CASE("The desktop's own authentication dialog is the one shown",
     // was written to a terminal nobody is looking at. The flag has to come
     // before the program, or pkexec passes it to the program instead.
     const QStringList cmd = buildElevationCommand(
-        QStringLiteral("/usr/bin/rpi-imager"), QStringList{});
+        QStringLiteral("/usr/bin/vbase-imager"), QStringList{});
 
     const int flagIndex = cmd.indexOf(QStringLiteral("--disable-internal-agent"));
     REQUIRE(flagIndex != -1);
-    CHECK(flagIndex < cmd.indexOf(QStringLiteral("/usr/bin/rpi-imager")));
+    CHECK(flagIndex < cmd.indexOf(QStringLiteral("/usr/bin/vbase-imager")));
 }
 
 TEST_CASE("The user's arguments survive elevation intact",
@@ -5040,7 +5040,7 @@ TEST_CASE("The user's arguments survive elevation intact",
             QStringLiteral("/dev/sda"),
         };
         const QStringList cmd = buildElevationCommand(
-            QStringLiteral("/usr/bin/rpi-imager"), given);
+            QStringLiteral("/usr/bin/vbase-imager"), given);
 
         REQUIRE(cmd.size() == 3 + given.size());
         CHECK(cmd.mid(3) == given);
@@ -5055,7 +5055,7 @@ TEST_CASE("The user's arguments survive elevation intact",
         const QString path =
             QStringLiteral("/home/pi/Raspberry Pi/os images/raspios.img");
         const QStringList cmd = buildElevationCommand(
-            QStringLiteral("/usr/bin/rpi-imager"), QStringList{path});
+            QStringLiteral("/usr/bin/vbase-imager"), QStringList{path});
 
         REQUIRE(cmd.size() == 4);
         CHECK(cmd[3] == path);
@@ -5073,7 +5073,7 @@ TEST_CASE("The user's arguments survive elevation intact",
             QStringLiteral("a\nb"),
         };
         const QStringList cmd = buildElevationCommand(
-            QStringLiteral("/usr/bin/rpi-imager"), given);
+            QStringLiteral("/usr/bin/vbase-imager"), given);
 
         REQUIRE(cmd.size() == 3 + given.size());
         CHECK(cmd.mid(3) == given);
@@ -5082,11 +5082,11 @@ TEST_CASE("The user's arguments survive elevation intact",
     SECTION("with no arguments, only the three elements are present")
     {
         const QStringList cmd = buildElevationCommand(
-            QStringLiteral("/usr/bin/rpi-imager"), QStringList{});
+            QStringLiteral("/usr/bin/vbase-imager"), QStringList{});
 
         CHECK(cmd == QStringList{QStringLiteral("/usr/bin/pkexec"),
                                  QStringLiteral("--disable-internal-agent"),
-                                 QStringLiteral("/usr/bin/rpi-imager")});
+                                 QStringLiteral("/usr/bin/vbase-imager")});
     }
 }
 
@@ -5100,7 +5100,7 @@ TEST_CASE("An unusual install location is passed through as it is",
     // matched against this same resolved path by hasPolkitPolicyForPath
     // before we get here, so what is checked and what is run agree.
     const QString bundle =
-        QStringLiteral("/tmp/.mount_rpi-imAbC123/usr/bin/rpi-imager");
+        QStringLiteral("/tmp/.mount_rpi-imAbC123/usr/bin/vbase-imager");
     const QStringList cmd = buildElevationCommand(bundle, QStringList{});
 
     REQUIRE(cmd.size() == 3);
@@ -5739,17 +5739,17 @@ TEST_CASE("Stale policies are cleared out, and the ones in use are left alone",
     };
 
     // Five shapes, one per arm of the sweep.
-    policy(QStringLiteral("com.raspberrypi.rpi-imager.appimage-notag.policy"),
+    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-notag.policy"),
            QStringLiteral("<action id=\"x\"><annotate key=\"other\">v</annotate></action>"));
-    policy(QStringLiteral("com.raspberrypi.rpi-imager.appimage-unclosed.policy"),
+    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-unclosed.policy"),
            QStringLiteral("<annotate key=\"") + tag + QStringLiteral("/some/path"));
-    policy(QStringLiteral("com.raspberrypi.rpi-imager.appimage-empty.policy"),
+    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-empty.policy"),
            QStringLiteral("<annotate key=\"") + tag + QStringLiteral("</annotate>"));
-    policy(QStringLiteral("com.raspberrypi.rpi-imager.appimage-current.policy"),
+    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-current.policy"),
            QStringLiteral("<annotate key=\"") + tag + self + QStringLiteral("</annotate>"));
-    policy(QStringLiteral("com.raspberrypi.rpi-imager.appimage-gone.policy"),
+    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy"),
            QStringLiteral("<annotate key=\"") + tag
-               + QStringLiteral("/nonexistent/rpi-imager.AppImage</annotate>"));
+               + QStringLiteral("/nonexistent/vbase-imager.AppImage</annotate>"));
 
     // And one that is not ours: the sweep matches on our own naming, and
     // deleting somebody else's policy would take away rights we never gave.
@@ -5768,16 +5768,16 @@ TEST_CASE("Stale policies are cleared out, and the ones in use are left alone",
     };
 
     // Gone: it named a binary that is not there any more.
-    CHECK_FALSE(present(QStringLiteral("com.raspberrypi.rpi-imager.appimage-gone.policy")));
+    CHECK_FALSE(present(QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy")));
 
     // Kept: this one is the copy running now.
-    CHECK(present(QStringLiteral("com.raspberrypi.rpi-imager.appimage-current.policy")));
+    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-current.policy")));
 
     // Kept, because the sweep could not read a path out of them -- removing
     // a file it does not understand is not its business.
-    CHECK(present(QStringLiteral("com.raspberrypi.rpi-imager.appimage-notag.policy")));
-    CHECK(present(QStringLiteral("com.raspberrypi.rpi-imager.appimage-unclosed.policy")));
-    CHECK(present(QStringLiteral("com.raspberrypi.rpi-imager.appimage-empty.policy")));
+    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-notag.policy")));
+    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-unclosed.policy")));
+    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-empty.policy")));
 
     // Kept, and not ours to touch.
     CHECK(present(QStringLiteral("org.example.something-else.policy")));
@@ -5808,7 +5808,7 @@ TEST_CASE("An AppImage in a deeply nested directory still gets its policy",
         nested += QStringLiteral("/anested-directory-segment");
     REQUIRE(QDir().mkpath(nested));
 
-    const QString copied = nested + QStringLiteral("/rpi-imager.AppImage");
+    const QString copied = nested + QStringLiteral("/vbase-imager.AppImage");
     REQUIRE(QFile::copy(QStringLiteral(ELEVATION_PROBE_BINARY), copied));
     REQUIRE(QFile::setPermissions(copied,
                                   QFileDevice::ReadOwner | QFileDevice::WriteOwner |
@@ -6153,7 +6153,7 @@ TEST_CASE("Windows declines to re-exec itself elevated",
     // The manifest asks for administrator, so the process is already elevated
     // or it was never going to be. Answering yes here would start a second
     // copy of Imager while the first was still running.
-    char program[] = "rpi-imager";
+    char program[] = "vbase-imager";
     char *argv[] = {program, nullptr};
     CHECK_FALSE(PlatformQuirks::tryElevate(1, argv));
 

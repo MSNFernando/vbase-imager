@@ -76,7 +76,7 @@ inline void removeScratchPaths()
  */
 inline void useScratchPaths(const QString &testName)
 {
-    QCoreApplication::setOrganizationName(QStringLiteral("rpi-imager-tests"));
+    QCoreApplication::setOrganizationName(QStringLiteral("vbase-imager-tests"));
     const QString name =
         QStringLiteral("%1-%2").arg(testName).arg(QCoreApplication::applicationPid());
     QCoreApplication::setApplicationName(name);

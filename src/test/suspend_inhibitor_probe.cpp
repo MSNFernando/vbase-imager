@@ -30,7 +30,7 @@
 namespace {
 
 constexpr const char *kFifoDir    = "/run";
-constexpr const char *kFifoPrefix = "rpi-imager-suspend_";
+constexpr const char *kFifoPrefix = "vbase-imager-suspend_";
 
 // The inhibitor's FIFOs, by name. It picks a random one each time, so the
 // only way to know which is ours is to look before and after.

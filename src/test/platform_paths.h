@@ -41,17 +41,17 @@ inline QString unwritableDir()
         const DWORD mask = GetLogicalDrives();
         for (int letter = 'Z'; letter >= 'D'; --letter) {
             if (!(mask & (1u << (letter - 'A'))))
-                return QStringLiteral("%1:/rpi-imager-nowhere")
+                return QStringLiteral("%1:/vbase-imager-nowhere")
                     .arg(QChar::fromLatin1(char(letter)));
         }
         // Every letter is taken. A reserved device name cannot be a directory
         // either, so creation below it still fails -- just with a different
         // error.
-        return QStringLiteral("C:/NUL/rpi-imager-nowhere");
+        return QStringLiteral("C:/NUL/vbase-imager-nowhere");
     }();
     return dir;
 #else
-    return QStringLiteral("/nonexistent-rpi-imager-dir/deeper");
+    return QStringLiteral("/nonexistent-vbase-imager-dir/deeper");
 #endif
 }
 

@@ -131,7 +131,7 @@ public:
     {
 #ifdef Q_OS_MACOS
         _dir = QDir::temp().filePath(
-            QStringLiteral("rpi-imager-hdi-%1")
+            QStringLiteral("vbase-imager-hdi-%1")
                 .arg(QUuid::createUuid().toString(QUuid::WithoutBraces).left(8)));
         if (!QDir().mkpath(_dir))
             return;
@@ -169,7 +169,7 @@ public:
             return;
 
         _dir = QDir::temp().filePath(
-            QStringLiteral("rpi-imager-loop-%1")
+            QStringLiteral("vbase-imager-loop-%1")
                 .arg(QUuid::createUuid().toString(QUuid::WithoutBraces).left(8)));
         if (!QDir().mkpath(_dir))
             return;
@@ -412,7 +412,7 @@ private:
             return;
 
         _dir = QDir::temp().filePath(
-            QStringLiteral("rpi-imager-faulty-%1")
+            QStringLiteral("vbase-imager-faulty-%1")
                 .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
         if (!QDir().mkpath(_dir))
             return;
@@ -475,12 +475,12 @@ private:
         // Unique per instance, not just per process: two of these exist in
         // quick succession within a run, and a name collision would have one
         // tear down the other's mapping underneath it.
-        : _name(QStringLiteral("rpi-imager-test-%1-%2")
+        : _name(QStringLiteral("vbase-imager-test-%1-%2")
                     .arg(QCoreApplication::applicationPid())
                     .arg(QUuid::createUuid().toString(QUuid::WithoutBraces).left(8)))
     {
         _dir = QDir::temp().filePath(
-            QStringLiteral("rpi-imager-faulty-%1")
+            QStringLiteral("vbase-imager-faulty-%1")
                 .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
         QDir().mkpath(_dir);
         _backing = QDir(_dir).filePath(QStringLiteral("backing.img"));

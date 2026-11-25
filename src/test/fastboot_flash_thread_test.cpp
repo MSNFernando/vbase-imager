@@ -2191,7 +2191,7 @@ class ConnectApiStub
 {
 public:
     ConnectApiStub(int status, const QByteArray &body)
-        : _hits(QDir::temp().filePath(QStringLiteral("rpi-imager-connect-%1")
+        : _hits(QDir::temp().filePath(QStringLiteral("vbase-imager-connect-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         static const char *kScript =

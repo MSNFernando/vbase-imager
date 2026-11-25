@@ -142,7 +142,7 @@ int openUrlWithoutFork()
     // probe links Qt6::DBus, sessionBus() tries to autolaunch a daemon --
     // which forks, and forking is the very thing being denied below, so the
     // probe hangs instead of reaching launchDetached.
-    setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent-rpi-imager-bus", 1);
+    setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent-vbase-imager-bus", 1);
     setenv("BROWSER", "/bin/true", 1);
 
     // One call before the limit drops, so QtDBus has already made whatever

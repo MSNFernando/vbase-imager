@@ -33,7 +33,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-fetch-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-fetch-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);

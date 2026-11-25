@@ -67,7 +67,7 @@ TEST_CASE("A quoted value reaches the shell exactly as it was typed",
         {"a password with a space",       "correct horse battery"},
         {"an apostrophe",                 "o'brien"},
         {"nothing but apostrophes",       "\'\'\'"},
-        {"a semicolon and a command",     "x'; touch /tmp/rpi-imager-pwned; '"},
+        {"a semicolon and a command",     "x'; touch /tmp/vbase-imager-pwned; '"},
         {"command substitution",          "$(id)"},
         {"backticks",                     "`id`"},
         {"a variable",                    "$HOME and ${PATH}"},
@@ -91,7 +91,7 @@ TEST_CASE("A quoted value reaches the shell exactly as it was typed",
     }
 
     // Nothing above was allowed to actually run.
-    CHECK_FALSE(QFile::exists(QStringLiteral("/tmp/rpi-imager-pwned")));
+    CHECK_FALSE(QFile::exists(QStringLiteral("/tmp/vbase-imager-pwned")));
 }
 
 TEST_CASE("A quoted value is a single shell word", "[customization][shellquoting]") {

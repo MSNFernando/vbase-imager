@@ -7,8 +7,8 @@
         <file>keymap-layouts.txt</file>
         <file>capital-cities.txt</file>
         <file>sounds/chime.wav</file>
-        <file>icons/rpi-imager.ico</file>
-        <file alias="icons/rpi-imager.svg">linux/icon/rpi-imager.svg</file>
+        <file>icons/vbase-imager.ico</file>
+        <file alias="icons/vbase-imager.svg">linux/icon/vbase-imager.svg</file>
     </qresource>
 
     <!-- Resources used by QML: -->

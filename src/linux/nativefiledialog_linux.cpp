@@ -108,8 +108,8 @@ static QString portalParentHandleForWindow(QWindow *window)
     // Platform detection is RUNTIME-based, not compile-time
     // Qt automatically selects the platform when the app starts
     // To test different backends, set the QT_QPA_PLATFORM environment variable:
-    //   QT_QPA_PLATFORM=xcb ./rpi-imager      (force X11)
-    //   QT_QPA_PLATFORM=wayland ./rpi-imager  (force Wayland)
+    //   QT_QPA_PLATFORM=xcb ./vbase-imager      (force X11)
+    //   QT_QPA_PLATFORM=wayland ./vbase-imager  (force Wayland)
     const QString platform = QGuiApplication::platformName().toLower();
     
     // X11/XCB backend

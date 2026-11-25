@@ -71,7 +71,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-fw-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-fw-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);
@@ -259,7 +259,7 @@ TEST_CASE("FirmwareManager rejects a cache directory that is not there", "[firmw
 {
     TestableFirmwareManager fm;
 
-    CHECK_FALSE(fm.validateCacheForDevice(fs::path("/nonexistent-rpi-imager/version"),
+    CHECK_FALSE(fm.validateCacheForDevice(fs::path("/nonexistent-vbase-imager/version"),
                                           SideloadMode::Fastboot, ChipGeneration::BCM2712));
 }
 
@@ -605,7 +605,7 @@ TEST_CASE("FirmwareManager reports a download it cannot write", "[firmware]")
 
     TestableFirmwareManager fm;
     CHECK_FALSE(fm.downloadFile("http://127.0.0.1:1/x.bin",
-                                fs::path("/nonexistent-rpi-imager-dir/deeper/out.bin"),
+                                fs::path("/nonexistent-vbase-imager-dir/deeper/out.bin"),
                                 nullptr, cancelled));
 }
 

@@ -58,7 +58,7 @@ if [ -z "$CLI" ]; then
 	CLI=$(pick_in_dir "$DEST" "Raspberry_Pi_Imager-*-cli-${IMG_ARCH}.AppImage")
 fi
 
-copy_one desktop "$DESKTOP" "rpi-imager-${IMG_ARCH}.AppImage"
-copy_one cli "$CLI" "rpi-imager-cli-${IMG_ARCH}.AppImage"
+copy_one desktop "$DESKTOP" "vbase-imager-${IMG_ARCH}.AppImage"
+copy_one cli "$CLI" "vbase-imager-cli-${IMG_ARCH}.AppImage"
 
 echo "sync-appimages: ready in $DEST"

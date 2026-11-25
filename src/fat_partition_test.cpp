@@ -54,7 +54,7 @@ static std::string makeScratchDisk() {
     // directory a cluster at a time until the image is full.
     std::error_code ec;
     const fs::path dir = fs::temp_directory_path(ec)
-        / ("rpi-imager-fat-scratch-"
+        / ("vbase-imager-fat-scratch-"
            + std::to_string(QCoreApplication::applicationPid()));
     if (ec)
         return {};

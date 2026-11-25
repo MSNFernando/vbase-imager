@@ -6,7 +6,7 @@ Build-Depends: debhelper-compat (= 13), cmake, libgnutls28-dev, liburing-dev, dh
 Standards-Version: 4.1.2
 Homepage: https://www.raspberrypi.com/software
 
-Package: rpi-imager
+Package: vbase-imager
 Build-Profiles: <desktop>
 Architecture: amd64 arm64 armhf
 # The bundled AppImage runtime is AppImage/type2-runtime, which links libfuse3
@@ -43,11 +43,11 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, fuse,
          libdbus-1-3,
          libdrm2, libgbm1, libinput10, libudev1
 Recommends: udisks2
-Conflicts: rpi-imager-embedded
+Conflicts: vbase-imager-embedded
 Description: Raspberry Pi Imaging utility
  A user-friendly tool for creating bootable media for Raspberry Pi Devices.
 
-Package: rpi-imager-embedded
+Package: vbase-imager-embedded
 Build-Profiles: <embedded>
 Architecture: arm64
 # The package vendors Qt and its support libraries under /opt for the
@@ -63,7 +63,7 @@ Depends: util-linux (>= 2.37),
          libc6, libgcc-s1, libstdc++6,
          libdrm2, libinput10, libudev1
 Suggests: rpi-eeprom, firmware-brcm80211
-Conflicts: rpi-imager
+Conflicts: vbase-imager
 Description: Raspberry Pi Imaging utility for embedded systems
  A user-friendly tool for creating bootable media for Raspberry Pi devices,
  optimized for embedded systems.
@@ -74,15 +74,15 @@ Description: Raspberry Pi Imaging utility for embedded systems
   - Smaller memory footprint for embedded applications
   - Supports DRM/KMS rendering
 
-Package: rpi-imager-cli
+Package: vbase-imager-cli
 Build-Profiles: <cli>
 Architecture: amd64 arm64 armhf
-# See the fuse note on the rpi-imager stanza above: the AppImage runtime
+# See the fuse note on the vbase-imager stanza above: the AppImage runtime
 # bundles libfuse3 statically, and libfuse2 must not come back.
 Depends: ${shlibs:Depends}, ${misc:Depends},
          fuse, util-linux (>= 2.37),
          libstdc++6, libatomic1
-Conflicts: rpi-imager, rpi-imager-embedded
+Conflicts: vbase-imager, vbase-imager-embedded
 Description: Raspberry Pi Imaging utility (command-line only)
  A command-line tool for creating bootable media for Raspberry Pi devices.
  .

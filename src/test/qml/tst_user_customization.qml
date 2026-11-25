@@ -526,8 +526,8 @@ TestCase {
         // hand and an installer can write for them. Quoted back as rich text,
         // an <img> in it is fetched the moment the notice appears -- the
         // settings file calling home. The warning is the proof.
-        failOnWarning(/rpi-imager-notice-beacon/)
-        rebuildWith("<img src=\"rpi-imager-notice-beacon.png\"/>")
+        failOnWarning(/vbase-imager-notice-beacon/)
+        rebuildWith("<img src=\"vbase-imager-notice-beacon.png\"/>")
 
         verify(usernameNotice().visible, "the step says what happened")
         compare(usernameNotice().textFormat, Text.PlainText)

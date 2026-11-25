@@ -53,8 +53,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vBase-Imager-linux-x86_64
-          path: vBase_Imager-*.AppImage
+          name: vbase-imager-linux-x86_64
+          path: vbase-imager-*-desktop-x86_64.AppImage
           if-no-files-found: error
 
   windows:
@@ -94,7 +94,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vBase-Imager-windows-x64
+          name: vbase-imager-windows-x64
           path: build/deploy/
           if-no-files-found: error
 
@@ -129,6 +129,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vBase-Imager-macos
+          name: vbase-imager-macos
           path: build/*.dmg
           if-no-files-found: error

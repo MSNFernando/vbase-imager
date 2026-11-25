@@ -374,7 +374,7 @@ TEST_CASE("Writing to a path that cannot be created is reported",
 
     Bootfiles bf;
     REQUIRE(bf.extractFromMemory(tar));
-    CHECK_FALSE(bf.writeToFile("/nonexistent-rpi-imager-dir-8f21/out.tar"));
+    CHECK_FALSE(bf.writeToFile("/nonexistent-vbase-imager-dir-8f21/out.tar"));
     CHECK_FALSE(bf.lastError().empty());
 }
 
@@ -382,7 +382,7 @@ TEST_CASE("Reading an archive that is not there is reported",
           "[rpiboot][bootfiles][negative]")
 {
     Bootfiles bf;
-    CHECK_FALSE(bf.extractFromFile("/nonexistent-rpi-imager-dir-8f21/in.tar"));
+    CHECK_FALSE(bf.extractFromFile("/nonexistent-vbase-imager-dir-8f21/in.tar"));
     CHECK_FALSE(bf.lastError().empty());
     CHECK(bf.size() == 0);
 }

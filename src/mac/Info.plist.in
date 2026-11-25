@@ -43,7 +43,7 @@
       <string>vBase Imager URL</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>rpi-imager</string>
+        <string>vbase-imager</string>
       </array>
     </dict>
   </array>
@@ -59,7 +59,7 @@
       <string>Owner</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>com.raspberrypi.rpi-imager-manifest</string>
+        <string>com.onecomet.vbase-imager-manifest</string>
       </array>
     </dict>
   </array>
@@ -67,7 +67,7 @@
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>com.raspberrypi.rpi-imager-manifest</string>
+      <string>com.onecomet.vbase-imager-manifest</string>
       <key>UTTypeDescription</key>
       <string>vBase Imager Manifest</string>
       <key>UTTypeConformsTo</key>
@@ -79,10 +79,10 @@
       <dict>
         <key>public.filename-extension</key>
         <array>
-          <string>rpi-imager-manifest</string>
+          <string>vbase-imager-manifest</string>
         </array>
         <key>public.mime-type</key>
-        <string>application/vnd.raspberrypi.imager-manifest+json</string>
+        <string>application/vnd.onecomet.vbase-imager-manifest+json</string>
       </dict>
     </dict>
   </array>

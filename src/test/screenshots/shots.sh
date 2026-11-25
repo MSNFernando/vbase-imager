@@ -19,7 +19,7 @@
 # Needs a desktop GUI build configured with -DENABLE_TEST_HOOKS=ON, which
 # compiles in the screenshot hook. Release builds leave it out on purpose.
 #
-# Usage: shots.sh /path/to/rpi-imager [output-dir]
+# Usage: shots.sh /path/to/vbase-imager [output-dir]
 #
 #   RPI_SHOT_PAGES=<file>      page list (default: pages.txt beside this)
 #   RPI_SHOT_FILTER=<glob>     render only pages whose name matches
@@ -60,7 +60,7 @@ shown_os="Raspberry Pi OS (64-bit)"
 imager=${1:-}
 outdir=${2:-$PWD/screenshots}
 if [ -z "$imager" ]; then
-    echo "usage: $(basename "$0") /path/to/rpi-imager [output-dir]" >&2
+    echo "usage: $(basename "$0") /path/to/vbase-imager [output-dir]" >&2
     exit 2
 fi
 if [ ! -x "$imager" ]; then

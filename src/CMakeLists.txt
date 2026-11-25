@@ -56,7 +56,7 @@ if(APPLE)
     endif()
 endif()
 
-project(rpi-imager LANGUAGES CXX C)
+project(vbase-imager LANGUAGES CXX C)
 
 find_package(Git QUIET)
 
@@ -92,7 +92,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # One place to define the Windows callback IPC port
-set(IMAGER_CALLBACK_PORT "49629" CACHE STRING "TCP port for rpi-imager callback relay on Windows")
+set(IMAGER_CALLBACK_PORT "49629" CACHE STRING "TCP port for vbase-imager callback relay on Windows")
 
 # Is this an instrumented build? Asked once, here, because both the
 # optimisation level and LTO below have to yield to it.
@@ -517,7 +517,7 @@ if (WIN32)
             PRIVATE RPI_IMAGER_CALLBACK_PORT=${IMAGER_CALLBACK_PORT})
 
     # Ensure the relay builds with the app
-    add_dependencies(${PROJECT_NAME} rpi-imager-callback-relay)
+    add_dependencies(${PROJECT_NAME} vbase-imager-callback-relay)
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${DEPENDENCIES})
 endif()
@@ -527,7 +527,7 @@ add_dependencies(${PROJECT_NAME} generate_version)
 
 # Set output name based on build type
 if(BUILD_CLI_ONLY)
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rpi-imager-cli")
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "vbase-imager-cli")
 endif()
 
 # Create an rpi-imager_lupdate target

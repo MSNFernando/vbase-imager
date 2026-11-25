@@ -58,7 +58,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-sbp-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-sbp-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);
@@ -1318,7 +1318,7 @@ TEST_CASE("A boot image is not claimed when there is nowhere to stage its files"
 
     const bool hadTmpdir = qEnvironmentVariableIsSet("TMPDIR");
     const QByteArray savedTmpdir = qgetenv("TMPDIR");
-    qputenv("TMPDIR", QByteArray("/nonexistent-rpi-imager-staging"));
+    qputenv("TMPDIR", QByteArray("/nonexistent-vbase-imager-staging"));
 
     const bool created = BootImgCreator::createBootImg(files, out, 4 * 1024 * 1024);
 

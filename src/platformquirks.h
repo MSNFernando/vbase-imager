@@ -125,13 +125,13 @@ namespace PlatformQuirks {
     bool openUrlExternally(const QUrl& url);
 
     /**
-     * Register this application as the handler for the rpi-imager:// URL
+     * Register this application as the handler for the vbase-imager:// URL
      * scheme, so the Raspberry Pi Connect sign-in flow can hand the auth token
-     * back by redirecting the browser to an rpi-imager:// URL.
+     * back by redirecting the browser to a vbase-imager:// URL.
      *
      * Platform mechanics differ, but all live behind this one call:
      *   - Linux: writes a user-level .desktop entry pointing at this
-     *     executable and registers it as the default x-scheme-handler/rpi-imager
+     *     executable and registers it as the default x-scheme-handler/vbase-imager
      *     handler (packaged installs ship a system one; AppImages and other
      *     unpackaged runs need this at runtime).
      *   - macOS: LSSetDefaultHandlerForURLScheme against this app's bundle.

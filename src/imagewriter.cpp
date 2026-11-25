@@ -5322,7 +5322,7 @@ bool ImageWriter::hasPerformanceData()
 
 QString ImageWriter::getPerformanceDataFilename()
 {
-    return QString("rpi-imager-performance-%1.json")
+    return QString("vbase-imager-performance-%1.json")
         .arg(QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss"));
 }
 

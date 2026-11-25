@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2026 Raspberry Pi Ltd
  *
- * Stands in for rpi-imager.exe so the relay's launch path can be tested.
+ * Stands in for vbase-imager.exe so the relay's launch path can be tested.
  *
  * When no Imager is listening, the relay falls back to starting one beside
  * itself and handing it the callback URL -- the Pi Connect sign-in path for

@@ -346,7 +346,7 @@ TestCase {
         var picker = findChild(mgr, "sshBrowseKeyFileDialog")
         verify(picker, "found the key picker")
 
-        picker.selectedFile = "file:///tmp/rpi-imager-no-such-key.pub"
+        picker.selectedFile = "file:///tmp/vbase-imager-no-such-key.pub"
         picker.accepted()
 
         compare(mgr.keys.length, 0)

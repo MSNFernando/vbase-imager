@@ -32,7 +32,7 @@ static os_log_t platform_log() {
     static os_log_t log = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        log = os_log_create("com.raspberrypi.imager", "platform");
+        log = os_log_create("com.onecomet.vbase-imager", "platform");
     });
     return log;
 }
@@ -411,7 +411,7 @@ bool openUrlExternally(const QUrl& url) {
 }
 
 bool registerUriScheme() {
-    // Claim the rpi-imager:// scheme via Launch Services so the browser can
+    // Claim the vbase-imager:// scheme via Launch Services so the browser can
     // hand the Connect auth token back to us. Requires a bundle identity, so
     // this is a no-op (returns false) for a plain executable without an
     // Info.plist (e.g. a unit-test binary).
@@ -423,7 +423,7 @@ bool registerUriScheme() {
     if (!bundleId) {
         return false;
     }
-    OSStatus status = LSSetDefaultHandlerForURLScheme(CFSTR("rpi-imager"), bundleId);
+    OSStatus status = LSSetDefaultHandlerForURLScheme(CFSTR("vbase-imager"), bundleId);
     return status == noErr;
 }
 

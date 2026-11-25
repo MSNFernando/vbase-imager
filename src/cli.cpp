@@ -179,7 +179,7 @@ int Cli::run()
         const char* commonMsg = "Writing to storage devices requires elevated privileges.";
         
 #ifdef Q_OS_LINUX
-        // Get the actual executable name (e.g., AppImage name or 'rpi-imager')
+        // Get the actual executable name (e.g., AppImage name or 'vbase-imager')
         // Check if running from AppImage first
         QString execName;
         QByteArray appImagePath = qgetenv("APPIMAGE");

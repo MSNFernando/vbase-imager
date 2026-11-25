@@ -5,11 +5,24 @@
 #   APP_NAME          — display name (e.g. "vBase Imager")
 #   APP_BUNDLE_PATH   — path to .app bundle
 #   BUILD_DIR         — CMAKE_BINARY_DIR
+#   FILE_STEM         — DMG file name stem (e.g. "vbase-imager")
 
 include("${VERSION_VARS_FILE}")
 
 set(DMG_PATH "${BUILD_DIR}/${APP_NAME}.dmg")
-set(FINAL_DMG_PATH "${BUILD_DIR}/${APP_NAME}-${IMAGER_VERSION_STR}.dmg")
+set(FINAL_DMG_PATH "${BUILD_DIR}/${FILE_STEM}-${IMAGER_VERSION_STR}.dmg")
+
+# The build tree's bundle is named after the CMake target; the DMG carries it
+# as "<APP_NAME>.app" beside an Applications link.
+set(STAGE_DIR "${BUILD_DIR}/dmg-stage")
+file(REMOVE_RECURSE "${STAGE_DIR}")
+file(MAKE_DIRECTORY "${STAGE_DIR}")
+execute_process(COMMAND ditto "${APP_BUNDLE_PATH}" "${STAGE_DIR}/${APP_NAME}.app"
+                RESULT_VARIABLE result)
+if(NOT result EQUAL 0)
+    message(FATAL_ERROR "ditto failed with exit code ${result}")
+endif()
+file(CREATE_LINK "/Applications" "${STAGE_DIR}/Applications" SYMBOLIC)
 
 message(STATUS "Creating DMG...")
 
@@ -31,7 +44,7 @@ if(has_diskutil_image EQUAL 0)
         COMMAND diskutil image create from
             --volumeName "${APP_NAME}"
             --format ULMO
-            "${APP_BUNDLE_PATH}"
+            "${STAGE_DIR}"
             "${DMG_PATH}"
         RESULT_VARIABLE result
     )
@@ -40,7 +53,7 @@ else()
     execute_process(
         COMMAND hdiutil create
             -volname "${APP_NAME}"
-            -srcfolder "${APP_BUNDLE_PATH}"
+            -srcfolder "${STAGE_DIR}"
             -format ULMO
             "${DMG_PATH}"
         RESULT_VARIABLE result
@@ -51,4 +64,5 @@ if(NOT result EQUAL 0)
 endif()
 
 message(STATUS "Creating versioned DMG at ${FINAL_DMG_PATH}...")
-file(COPY_FILE "${DMG_PATH}" "${FINAL_DMG_PATH}")
+file(RENAME "${DMG_PATH}" "${FINAL_DMG_PATH}")
+file(REMOVE_RECURSE "${STAGE_DIR}")

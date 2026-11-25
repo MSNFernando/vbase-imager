@@ -1,4 +1,4 @@
-# udev rules for Raspberry Pi USB device access from rpi-imager.
+# udev rules for Raspberry Pi USB device access from vbase-imager.
 #
 # Two device classes need unprivileged (non-root) access:
 #   1. Broadcom boot ROM (VID 0a5c) — a Compute Module / Pi in rpiboot
@@ -8,7 +8,7 @@
 #      re-enumerates into after sideload, and over which the imager flashes
 #      storage. The gadget borrows Google's VID; PID 4e40 is RPi-specific.
 #
-# Installed to /usr/lib/udev/rules.d/ by the rpi-imager package. For a bare
+# Installed to /usr/lib/udev/rules.d/ by the vbase-imager package. For a bare
 # AppImage (which cannot install system files), copy this to /etc/udev/rules.d/
 # and reload:
 #   sudo udevadm control --reload-rules && sudo udevadm trigger

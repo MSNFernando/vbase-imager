@@ -286,7 +286,7 @@ static QString windowsFontEngineFromPlatformArgs(const QByteArray &platformArgs)
 }
 
 WindowIconSource windowIconSource() {
-    return {QString(), QStringLiteral(":/icons/rpi-imager.ico")};
+    return {QString(), QStringLiteral(":/icons/vbase-imager.ico")};
 }
 
 void applyQuirks() {
@@ -541,7 +541,7 @@ bool openUrlExternally(const QUrl& url) {
 }
 
 bool registerUriScheme() {
-    // The rpi-imager:// scheme association is written to the registry by the
+    // The vbase-imager:// scheme association is written to the registry by the
     // installer at install time, so there is nothing to do at runtime.
     return true;
 }

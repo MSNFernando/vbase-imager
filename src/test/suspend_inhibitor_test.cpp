@@ -173,7 +173,7 @@ TEST_CASE("An inhibitor tool that is not installed leaves nothing behind",
     // be reaped -- and the FIFO has to go with it.
     REQUIRE_NAMESPACES();
 
-    const ProbeResult r = runProbe({QStringLiteral("rpi-imager-no-such-inhibitor")});
+    const ProbeResult r = runProbe({QStringLiteral("vbase-imager-no-such-inhibitor")});
     REQUIRE(r.ran);
     INFO("probe said:\n" << r.out.toStdString());
 
@@ -220,7 +220,7 @@ ProbeResult runGnomeProbe(const QStringList &probeArgs, bool onOwnBus,
         // rather than autolaunching one.
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
         env.insert(QStringLiteral("DBUS_SESSION_BUS_ADDRESS"),
-                   QStringLiteral("unix:path=/nonexistent-rpi-imager-test"));
+                   QStringLiteral("unix:path=/nonexistent-vbase-imager-test"));
         p.setProcessEnvironment(env);
         p.start(QStringLiteral(GNOME_INHIBITOR_PROBE_BINARY), probeArgs);
     }
@@ -247,7 +247,7 @@ QStringList sawLines(const ProbeResult &r)
 QString scratchLog(const QString &name)
 {
     return QDir::temp().filePath(
-        QStringLiteral("rpi-imager-gnome-inhibit-%1-%2.log")
+        QStringLiteral("vbase-imager-gnome-inhibit-%1-%2.log")
             .arg(QCoreApplication::applicationPid())
             .arg(name));
 }

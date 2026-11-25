@@ -2,8 +2,8 @@
 Type=Application
 Name=vBase Imager (CLI)
 Comment=Write the vBase installer image to a USB stick
-Exec=rpi-imager-cli
-Icon=rpi-imager
+Exec=vbase-imager-cli
+Icon=vbase-imager
 Categories=System;
 Terminal=true
 NoDisplay=true

@@ -20,7 +20,7 @@ endif()
 # src/test/wlanapi_delayed.lib, found nothing, and failed the generate step
 # outright with "Cannot find source file". The application target never noticed,
 # because it is declared in this same scope. An absolute path is visible from
-# any directory, which is how rpi-imager.rc beside it has always worked.
+# any directory, which is how vbase-imager.rc beside it has always worked.
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/wlanapi_delayed.lib
     COMMAND ${CMAKE_DLLTOOL} --input-def "${CMAKE_CURRENT_SOURCE_DIR}/windows/wlanapi.def"
@@ -60,7 +60,7 @@ else()
 endif()
 
 set(DEPENDENCIES
-    ${CMAKE_BINARY_DIR}/rpi-imager.rc
+    ${CMAKE_BINARY_DIR}/vbase-imager.rc
     ${CMAKE_BINARY_DIR}/wlanapi_delayed.lib
 )
 set(EXTRALIBS setupapi ${CMAKE_BINARY_DIR}/wlanapi_delayed.lib Bcrypt.dll crypt32 wtsapi32 ole32 oleaut32 wbemuuid virtdisk)
@@ -69,12 +69,12 @@ set(EXTRALIBS setupapi ${CMAKE_BINARY_DIR}/wlanapi_delayed.lib Bcrypt.dll crypt3
 set(EXTRALIBS ${EXTRALIBS} winusb)
 
 # ---- Relay exe ----
-add_executable(rpi-imager-callback-relay WIN32 windows/CallbackRelay.cpp)
-target_compile_definitions(rpi-imager-callback-relay
+add_executable(vbase-imager-callback-relay WIN32 windows/CallbackRelay.cpp)
+target_compile_definitions(vbase-imager-callback-relay
     PRIVATE RPI_IMAGER_PORT=${IMAGER_CALLBACK_PORT}
-            RPI_IMAGER_EXE_NAME=L"rpi-imager.exe"
+            RPI_IMAGER_EXE_NAME=L"vbase-imager.exe"
             RPI_IMAGER_START_ON_FAIL=1)
-target_link_libraries(rpi-imager-callback-relay PRIVATE ws2_32)
+target_link_libraries(vbase-imager-callback-relay PRIVATE ws2_32)
 if (MINGW)
-  target_link_options(rpi-imager-callback-relay PRIVATE -municode)
+  target_link_options(vbase-imager-callback-relay PRIVATE -municode)
 endif()

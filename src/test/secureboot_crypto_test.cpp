@@ -157,7 +157,7 @@ TEST_CASE("A key that is not there is refused", "[secureboot][crypto]")
     const QByteArray digest =
         QCryptographicHash::hash(QByteArrayLiteral("x"), QCryptographicHash::Sha256);
     CHECK(SecureBootCrypto::rsaSignSha256(
-              digest, QStringLiteral("C:/nowhere/rpi-imager/absent.pem"))
+              digest, QStringLiteral("C:/nowhere/vbase-imager/absent.pem"))
               .isEmpty());
 }
 

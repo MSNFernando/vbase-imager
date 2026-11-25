@@ -39,7 +39,7 @@ inline QByteArray systemdFirstRun()
 /* A NoCloud instance id, unique per write. */
 inline QByteArray newInstanceId()
 {
-    return "rpi-imager-" + QByteArray::number(QDateTime::currentMSecsSinceEpoch());
+    return "vbase-imager-" + QByteArray::number(QDateTime::currentMSecsSinceEpoch());
 }
 
 /* The meta-data file the NoCloud datasource needs in order to be detected. */

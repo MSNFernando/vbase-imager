@@ -254,7 +254,7 @@ TestCase {
         var clicks = 0;
         var languagePicks = 0;
         var missingFor = 0;
-        var missingUrl = "file:///nonexistent/rpi-imager-chaos/no-such-list.json";
+        var missingUrl = "file:///nonexistent/vbase-imager-chaos/no-such-list.json";
         var maxTargets = 0;
         var keys = [Qt.Key_Down, Qt.Key_Up, Qt.Key_Tab, Qt.Key_Backtab,
                     Qt.Key_Return, Qt.Key_Space, Qt.Key_Escape, Qt.Key_A];

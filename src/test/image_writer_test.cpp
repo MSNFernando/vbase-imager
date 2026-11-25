@@ -568,7 +568,7 @@ TEST_CASE("A source that is not there is named before the card is measured",
     ImageWriter writer(nullptr);
     UiLog log(&writer);
 
-    const QString missing = QStringLiteral("/nonexistent-rpi-imager/gone.img");
+    const QString missing = QStringLiteral("/nonexistent-vbase-imager/gone.img");
     writer.setSrc(QUrl::fromLocalFile(missing), 0, 64ull * 1024 * 1024 * 1024);
     writer.setDst(QProcess::nullDevice(), 4ull * 1024 * 1024 * 1024);
     writer.startWrite();
@@ -4387,7 +4387,7 @@ TEST_CASE("A source file that vanished before the write starts is reported",
 // ══════════════════════════════════════════════════════════════
 // URLs arriving from outside the application
 //
-// handleIncomingUrl() is the rpi-imager:// scheme handler: a link somebody
+// handleIncomingUrl() is the vbase-imager:// scheme handler: a link somebody
 // clicks, or a hand-off from another application. It can point the OS list
 // at a different repository and carry a Connect token, so what it accepts
 // decides which images the user is offered and which organisation a device
@@ -4403,7 +4403,7 @@ TEST_CASE("A well-formed repository URL is accepted", "[imagewriter][url]")
                      [&accepted](QString u) { accepted << u; });
 
     w.handleIncomingUrl(QUrl(QStringLiteral(
-        "rpi-imager://open?repo=https://example.com/os_list.json")));
+        "vbase-imager://open?repo=https://example.com/os_list.json")));
 
     INFO("accepted: " << accepted.join(QStringLiteral(", ")).toStdString());
     CHECK(accepted.size() == 1);
@@ -4420,14 +4420,14 @@ TEST_CASE("Repository URLs that are not http(s) JSON are refused",
                      [&accepted](QString u) { accepted << u; });
 
     const QStringList hostile = {
-        QStringLiteral("rpi-imager://open?repo=file:///etc/passwd"),
-        QStringLiteral("rpi-imager://open?repo=javascript:alert(1)"),
-        QStringLiteral("rpi-imager://open?repo=ftp://example.com/os_list.json"),
+        QStringLiteral("vbase-imager://open?repo=file:///etc/passwd"),
+        QStringLiteral("vbase-imager://open?repo=javascript:alert(1)"),
+        QStringLiteral("vbase-imager://open?repo=ftp://example.com/os_list.json"),
         // Right scheme, but not a manifest.
-        QStringLiteral("rpi-imager://open?repo=https://example.com/payload.sh"),
-        QStringLiteral("rpi-imager://open?repo=https://example.com/"),
+        QStringLiteral("vbase-imager://open?repo=https://example.com/payload.sh"),
+        QStringLiteral("vbase-imager://open?repo=https://example.com/"),
         // Whitespace smuggling.
-        QStringLiteral("rpi-imager://open?repo=https://example.com/a.json%20extra"),
+        QStringLiteral("vbase-imager://open?repo=https://example.com/a.json%20extra"),
     };
 
     for (const QString &u : hostile) {
@@ -4450,7 +4450,7 @@ TEST_CASE("A repository URL with a query or fragment is still accepted",
                      [&accepted](QString u) { accepted << u; });
 
     w.handleIncomingUrl(QUrl(QStringLiteral(
-        "rpi-imager://open?repo=https://example.com/os_list.json%3Fv%3D2")));
+        "vbase-imager://open?repo=https://example.com/os_list.json%3Fv%3D2")));
 
     INFO("accepted: " << accepted.join(QStringLiteral(", ")).toStdString());
     CHECK(accepted.size() == 1);
@@ -4465,7 +4465,7 @@ TEST_CASE("A URL carrying nothing of interest is ignored", "[imagewriter][url]")
     QObject::connect(&w, &ImageWriter::connectTokenConflictDetected,
                      [&emitted](QString) { ++emitted; });
 
-    CHECK_NOTHROW(w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open"))));
+    CHECK_NOTHROW(w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open"))));
     CHECK_NOTHROW(w.handleIncomingUrl(QUrl()));
     CHECK(emitted == 0);
 }
@@ -5519,7 +5519,7 @@ WriteOutcome writeWithCustomisation(BootPartitionFixture &fx,
 TEST_CASE("A firstrun script lands in the boot partition", "[imagewriter][customisation][boot]")
 {
     BootPartitionFixture fx;
-    const QByteArray script = "#!/bin/bash\n# rpi-imager-test-marker-firstrun\nexit 0\n";
+    const QByteArray script = "#!/bin/bash\n# vbase-imager-test-marker-firstrun\nexit 0\n";
 
     const WriteOutcome out = writeWithCustomisation(fx, QByteArray(), QByteArray(), script);
     INFO("errors: " << out.errors.join(QStringLiteral(" | ")).toStdString());
@@ -5530,7 +5530,7 @@ TEST_CASE("A firstrun script lands in the boot partition", "[imagewriter][custom
     // The 8.3 directory entry FAT stores for "firstrun.sh".
     CHECK(written.contains(QByteArray("FIRSTRUNSH")));
     // ...and the script itself, not just a zero-length entry.
-    CHECK(written.contains(QByteArray("rpi-imager-test-marker-firstrun")));
+    CHECK(written.contains(QByteArray("vbase-imager-test-marker-firstrun")));
 }
 
 TEST_CASE("A cmdline append lands in the boot partition", "[imagewriter][customisation][boot]")
@@ -5939,7 +5939,7 @@ TEST_CASE("Customisation reaches a real card", "[imagewriter][device]")
     w.setSrc(QUrl::fromLocalFile(source), 0, BootPartitionFixture::kImageSize);
     w.setDst(dev, BootPartitionFixture::kImageSize);
     w.setImageCustomisation(QByteArray(), QByteArray(),
-                            "#!/bin/bash\n# rpi-imager-device-marker\nexit 0\n",
+                            "#!/bin/bash\n# vbase-imager-device-marker\nexit 0\n",
                             QByteArray(), QByteArray(),
                             ImageOptions::NoAdvancedOptions, QByteArray("systemd"));
 
@@ -5953,7 +5953,7 @@ TEST_CASE("Customisation reaches a real card", "[imagewriter][device]")
     QFile card(device.readPath());
     REQUIRE(card.open(QIODevice::ReadOnly));
     const QByteArray written = card.read(qint64(BootPartitionFixture::kImageSize));
-    CHECK(written.contains(QByteArray("rpi-imager-device-marker")));
+    CHECK(written.contains(QByteArray("vbase-imager-device-marker")));
     card.close();
 
     // Finding the bytes somewhere in 48 MiB is weaker than it looks: it holds
@@ -5991,7 +5991,7 @@ TEST_CASE("Customisation reaches a real card", "[imagewriter][device]")
         const QByteArray body = mtype.readAllStandardOutput();
         INFO("mtype stderr: " << QString::fromUtf8(mtype.readAllStandardError()).toStdString());
         CHECK(mtype.exitCode() == 0);
-        CHECK(body.contains(QByteArray("rpi-imager-device-marker")));
+        CHECK(body.contains(QByteArray("vbase-imager-device-marker")));
     }
 }
 
@@ -6250,7 +6250,7 @@ TEST_CASE("A trailing newline does not sneak a repo URL through", "[imagewriter]
     // before a final newline -- which is how issue #1687 got in. The pattern
     // is anchored with \A..\z for exactly this.
     w.handleIncomingUrl(QUrl(QStringLiteral(
-        "rpi-imager://open?repo=https%3A%2F%2Fexample.com%2Flist.json%0A")));
+        "vbase-imager://open?repo=https%3A%2F%2Fexample.com%2Flist.json%0A")));
 
     CHECK(repos.isEmpty());
 }
@@ -6262,7 +6262,7 @@ TEST_CASE("A well-formed auth key is accepted", "[imagewriter][url]")
 
     // rpuak_ followed by 24 Base58 characters is the shape Connect issues.
     const QString key = QStringLiteral("rpuak_123456789ABCDEFGHJKLMNPQ");
-    w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open?auth_key=") + key));
+    w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open?auth_key=") + key));
 
     CHECK(w.getRuntimeConnectToken() == key);
     w.clearConnectToken();
@@ -6282,7 +6282,7 @@ TEST_CASE("A malformed auth key is ignored", "[imagewriter][url]")
     for (const QString &bad : rejected) {
         INFO("candidate: " << bad.toStdString());
         w.clearConnectToken();
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open?auth_key=")
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open?auth_key=")
                                  + QUrl::toPercentEncoding(bad)));
         CHECK(w.getRuntimeConnectToken().isEmpty());
     }
@@ -6297,11 +6297,11 @@ TEST_CASE("A second, different auth key raises a conflict", "[imagewriter][url]"
     const QString first = QStringLiteral("rpuak_123456789ABCDEFGHJKLMNPQ");
     const QString second = QStringLiteral("rpuak_987654321ABCDEFGHJKLMNPQ");
 
-    w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open?auth_key=") + first));
+    w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open?auth_key=") + first));
     REQUIRE(w.getRuntimeConnectToken() == first);
 
     rpi_test::SignalLog conflicts(&w, &ImageWriter::connectTokenConflictDetected);
-    w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open?auth_key=") + second));
+    w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open?auth_key=") + second));
 
     // Replacing it silently would enrol the next card into a different
     // account than the one the user set up. QML gets to ask.
@@ -6318,13 +6318,13 @@ TEST_CASE("The same auth key arriving twice is not a conflict", "[imagewriter][u
     w.clearConnectToken();
 
     const QString key = QStringLiteral("rpuak_123456789ABCDEFGHJKLMNPQ");
-    w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open?auth_key=") + key));
+    w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open?auth_key=") + key));
     REQUIRE(w.getRuntimeConnectToken() == key);
 
     // Following the same link again is ordinary; prompting for it would be
     // noise.
     rpi_test::SignalLog conflicts(&w, &ImageWriter::connectTokenConflictDetected);
-    w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://open?auth_key=") + key));
+    w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://open?auth_key=") + key));
 
     CHECK(conflicts.isEmpty());
     CHECK(w.getRuntimeConnectToken() == key);
@@ -6563,7 +6563,7 @@ TEST_CASE("A verified customised write checks the files landed", "[imagewriter][
     w.setDst(fx.target(), BootPartitionFixture::kImageSize);
     w.setImageCustomisation(QByteArray("dtparam=audio=on\n"),
                             QByteArray(" rpi_imager_verified=1"),
-                            QByteArray("#!/bin/bash\n# rpi-imager-verified-marker\nexit 0\n"),
+                            QByteArray("#!/bin/bash\n# vbase-imager-verified-marker\nexit 0\n"),
                             QByteArray(), QByteArray(),
                             ImageOptions::NoAdvancedOptions, QByteArray("systemd"));
 
@@ -6573,7 +6573,7 @@ TEST_CASE("A verified customised write checks the files landed", "[imagewriter][
     REQUIRE(out.succeeded);
 
     const QByteArray written = fx.targetBytes();
-    CHECK(written.contains(QByteArray("rpi-imager-verified-marker")));
+    CHECK(written.contains(QByteArray("vbase-imager-verified-marker")));
     CHECK(written.contains(QByteArray("rpi_imager_verified=1")));
     CHECK(written.contains(QByteArray("dtparam=audio=on")));
 }
@@ -10440,14 +10440,14 @@ TEST_CASE("A deep link's token is taken only when it is well formed",
     rpi_test::SignalLog received(&w, &ImageWriter::connectTokenReceived);
 
     SECTION("a good token is accepted and reported") {
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=") + good));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=") + good));
 
         REQUIRE(received.count() == 1);
         CHECK(received.at(0).at(0).toString() == good);
     }
 
     SECTION("other query parameters do not confuse it") {
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?state=x&auth_key=")
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?state=x&auth_key=")
                                  + good + QStringLiteral("&next=y")));
 
         REQUIRE(received.count() == 1);
@@ -10455,10 +10455,10 @@ TEST_CASE("A deep link's token is taken only when it is well formed",
     }
 
     SECTION("a malformed token is dropped rather than passed on") {
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=nonsense")));
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=rpuak_short")));
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=")));
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect")));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=nonsense")));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=rpuak_short")));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=")));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect")));
 
         CHECK(received.count() == 0);
     }
@@ -10478,11 +10478,11 @@ TEST_CASE("A second deep link does not silently replace the token in use",
     rpi_test::SignalLog received(&w, &ImageWriter::connectTokenReceived);
     rpi_test::SignalLog conflicts(&w, &ImageWriter::connectTokenConflictDetected);
 
-    w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=") + first));
+    w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=") + first));
     REQUIRE(received.count() == 1);
 
     SECTION("a different token is reported as a conflict, not adopted") {
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=") + second));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=") + second));
 
         REQUIRE(conflicts.count() == 1);
         CHECK(conflicts.at(0).at(0).toString() == second);
@@ -10494,7 +10494,7 @@ TEST_CASE("A second deep link does not silently replace the token in use",
 
     SECTION("the same token again is not a conflict") {
         // A link opened twice is not a disagreement about anything.
-        w.handleIncomingUrl(QUrl(QStringLiteral("rpi-imager://connect?auth_key=") + first));
+        w.handleIncomingUrl(QUrl(QStringLiteral("vbase-imager://connect?auth_key=") + first));
 
         CHECK(conflicts.count() == 0);
         CHECK(received.count() == 1);
@@ -10515,7 +10515,7 @@ TEST_CASE("A deep link's repository is taken only when it is well formed",
 
     SECTION("a good repository comes through") {
         w.handleIncomingUrl(QUrl(QStringLiteral(
-            "rpi-imager://open?repo=https://example.com/os_list.json")));
+            "vbase-imager://open?repo=https://example.com/os_list.json")));
 
         REQUIRE(repos.count() == 1);
         CHECK(repos.at(0).at(0).toString()
@@ -10524,16 +10524,16 @@ TEST_CASE("A deep link's repository is taken only when it is well formed",
 
     SECTION("a newline-suffixed repository is ignored") {
         w.handleIncomingUrl(QUrl(QStringLiteral(
-            "rpi-imager://open?repo=https://example.com/os_list.json%0A")));
+            "vbase-imager://open?repo=https://example.com/os_list.json%0A")));
 
         CHECK(repos.count() == 0);
     }
 
     SECTION("a repository that is not a list is ignored") {
         w.handleIncomingUrl(QUrl(QStringLiteral(
-            "rpi-imager://open?repo=file:///etc/passwd.json")));
+            "vbase-imager://open?repo=file:///etc/passwd.json")));
         w.handleIncomingUrl(QUrl(QStringLiteral(
-            "rpi-imager://open?repo=https://example.com/evil?x=.json")));
+            "vbase-imager://open?repo=https://example.com/evil?x=.json")));
 
         CHECK(repos.count() == 0);
     }
@@ -11836,7 +11836,7 @@ TEST_CASE("A file the user already owns is narrowed without ceremony",
 // Handing back everything else an elevated run leaves behind.
 //
 // The settings file is not the only thing. An elevated Imager writes the
-// rpi-imager:// handler into ~/.local/share/applications, has
+// vbase-imager:// handler into ~/.local/share/applications, has
 // update-desktop-database rewrite mimeinfo.cache and xdg-mime rewrite
 // mimeapps.list, and fills a cache tree under ~/.cache -- all as root, all
 // in a directory belonging to somebody else. On the machine this was written
@@ -13654,7 +13654,7 @@ TEST_CASE("Asking for the Wi-Fi network the machine is on answers safely",
     CHECK_NOTHROW((void)w.getPSKForSSID(ssid));
     // Including for a network this machine has certainly never joined.
     QString unknown;
-    CHECK_NOTHROW(unknown = w.getPSKForSSID(QStringLiteral("rpi-imager-no-such-network")));
+    CHECK_NOTHROW(unknown = w.getPSKForSSID(QStringLiteral("vbase-imager-no-such-network")));
     CHECK(unknown.isEmpty());
 }
 
@@ -14044,7 +14044,7 @@ TEST_CASE("Every role the chooser binds to has the name QML uses",
 // ══════════════════════════════════════════════════════════════
 // A link handed over from a second launch
 //
-// Clicking an rpi-imager:// link when Imager is already running does not
+// Clicking an vbase-imager:// link when Imager is already running does not
 // start a second copy: the new process hands the URL to the running one over
 // D-Bus and exits. That is how the Raspberry Pi Connect sign-in callback gets
 // back to the window the user started from, so if the hand-off stops here,
@@ -14069,7 +14069,7 @@ TEST_CASE("A link handed over D-Bus reaches the running Imager",
     UriHandlerAdaptor adaptor(&w, &owner);
 
     adaptor.HandleUrl(QStringLiteral(
-        "rpi-imager://open?repo=https://example.com/os_list.json"));
+        "vbase-imager://open?repo=https://example.com/os_list.json"));
 
     // Handed over rather than run where it arrived. A D-Bus call is delivered
     // on whichever thread the connection is serviced from, and reaching into
@@ -14096,7 +14096,7 @@ TEST_CASE("A link over D-Bus is passed on exactly as it arrived",
     QObject owner;
     UriHandlerAdaptor adaptor(&w, &owner);
     adaptor.HandleUrl(QStringLiteral(
-        "rpi-imager://open?repo=https://example.com/os_list.json%3Fv%3D2"));
+        "vbase-imager://open?repo=https://example.com/os_list.json%3Fv%3D2"));
     QCoreApplication::processEvents();
 
     REQUIRE(accepted.size() == 1);
@@ -14123,8 +14123,8 @@ TEST_CASE("A D-Bus caller sending nonsense is ignored, not obeyed",
         QString(),
         QStringLiteral("not a url at all"),
         QStringLiteral("file:///etc/passwd"),
-        QStringLiteral("rpi-imager://open?repo=file:///etc/passwd"),
-        QStringLiteral("rpi-imager://open"),
+        QStringLiteral("vbase-imager://open?repo=file:///etc/passwd"),
+        QStringLiteral("vbase-imager://open"),
     };
     for (const QString &s : junk) {
         INFO("sent: " << s.toStdString());
@@ -15427,7 +15427,7 @@ TEST_CASE("With no native dialog the export asks QML for one", "[imagewriter][pe
     // The name has to be one a file manager will accept and a person can
     // find again, and it has to end in .json or the save dialog will not
     // filter to it.
-    CHECK(suggestedName.startsWith(QStringLiteral("rpi-imager-performance-")));
+    CHECK(suggestedName.startsWith(QStringLiteral("vbase-imager-performance-")));
     CHECK(suggestedName.endsWith(QStringLiteral(".json")));
     CHECK_FALSE(suggestedName.contains(QLatin1Char('/')));
     CHECK_FALSE(suggestedDir.isEmpty());
@@ -15766,7 +15766,7 @@ TEST_CASE("Mounting the source media read-only is refused without privilege",
         using ImageWriter::mountReadOnly;
     };
     RealMount w(nullptr);
-    const int rc = w.mountReadOnly(QStringLiteral("/dev/rpi-imager-no-such-device"),
+    const int rc = w.mountReadOnly(QStringLiteral("/dev/vbase-imager-no-such-device"),
                                    dir.path());
     INFO("mount returned " << rc);
     CHECK(rc != 0);

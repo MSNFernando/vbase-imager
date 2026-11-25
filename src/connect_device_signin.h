@@ -5,7 +5,7 @@
  * Raspberry Pi Connect device-code sign-in, for embedded Imager.
  *
  * The usual sign-in opens Connect in a browser and comes back through the
- * rpi-imager:// scheme; embedded Imager runs on a Pi with neither. Instead it
+ * vbase-imager:// scheme; embedded Imager runs on a Pi with neither. Instead it
  * asks Connect for a code (POST /client/device), shows it as a QR code and a
  * short code for a phone, and polls POST /client/token until someone signs in
  * and approves it there. What comes back is an rpdev_ access token, which is

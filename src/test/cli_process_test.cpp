@@ -277,7 +277,7 @@ TEST_CASE("Run without privileges, and it says how to get them", "[cli][process]
 #else
     CHECK_THAT(r.output.toStdString(), ContainsSubstring("Not running as root"));
     CHECK_THAT(r.output.toStdString(), ContainsSubstring("sudo"));
-    // Named, because on an AppImage the thing to type is not "rpi-imager".
+    // Named, because on an AppImage the thing to type is not "vbase-imager".
     CHECK_THAT(r.output.toStdString(), ContainsSubstring("--cli"));
 #endif
     // Whichever it said, it has to say why.
@@ -610,7 +610,7 @@ TEST_CASE("A completed write leaves no inhibitor behind",
     // too, and disappears when its run finishes; only a genuine leak stays.
     const auto fifoNames = []() {
         return QDir(QStringLiteral("/run"))
-            .entryList({QStringLiteral("rpi-imager-suspend_*")},
+            .entryList({QStringLiteral("vbase-imager-suspend_*")},
                        QDir::System | QDir::Files);
     };
     // One call, held in a named list: taking begin() from one temporary and

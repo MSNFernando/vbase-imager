@@ -433,7 +433,7 @@ if(COVERAGE_FLAVOUR STREQUAL "llvm")
                 "-show-branches=count"
                 "-show-line-counts-or-regions"
                 "-output-dir=${COVERAGE_OUTPUT_DIR}"
-                "-project-title=rpi-imager core coverage"
+                "-project-title=vbase-imager core coverage"
                 ${_project_sources}
         RESULT_VARIABLE _show_result
         ERROR_VARIABLE _llvm_show_error
@@ -511,7 +511,7 @@ else()
     # Every binary a test drives as a subprocess rather than links. Their
     # counters are real, and until they are read the sources reachable only
     # through them read as never run.
-    set(_subprocess_targets rpi-imager rpi-imager-callback-relay)
+    set(_subprocess_targets vbase-imager vbase-imager-callback-relay)
     set(_library_tracefile "${COVERAGE_BINARY_DIR}/coverage-library.json")
     set(_tracefile_args -a "${_library_tracefile}")
 
@@ -522,8 +522,8 @@ else()
     execute_process(
         COMMAND "${GCOVR_EXECUTABLE}"
                 ${_gcovr_parse_args}
-                --gcov-exclude-directories "rpi-imager\\.dir"
-                --gcov-exclude-directories "rpi-imager-callback-relay\\.dir"
+                --gcov-exclude-directories "vbase-imager\\.dir"
+                --gcov-exclude-directories "vbase-imager-callback-relay\\.dir"
                 "${COVERAGE_BINARY_DIR}"
                 --json "${_library_tracefile}"
         WORKING_DIRECTORY "${COVERAGE_BINARY_DIR}"
@@ -589,7 +589,7 @@ else()
                 # theme's green/yellow/red are ugly and unambiguous, in that
                 # order of importance.
                 --html-details "${COVERAGE_OUTPUT_DIR}/index.html"
-                --html-title "rpi-imager core coverage"
+                --html-title "vbase-imager core coverage"
                 --txt "${COVERAGE_OUTPUT_DIR}/summary.txt"
                 --print-summary
         WORKING_DIRECTORY "${COVERAGE_BINARY_DIR}"

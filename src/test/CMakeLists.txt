@@ -1,4 +1,4 @@
-# Test configuration for rpi-imager
+# Test configuration for vbase-imager
 # Uses Catch2 and CTest for testing
 
 # Fetch Catch2 for testing
@@ -603,7 +603,7 @@ if(WIN32)
         ${CMAKE_CURRENT_SOURCE_DIR}/..)
     target_link_libraries(callback_relay_process_test PRIVATE
         Catch2::Catch2WithMain Qt6::Core Qt6::Network)
-    # Stands in for rpi-imager.exe where the relay falls back to starting one.
+    # Stands in for vbase-imager.exe where the relay falls back to starting one.
     # The real binary asks for administrator, so launching it would put a UAC
     # prompt in front of the suite. See relay_launch_probe.cpp.
     add_executable(relay_launch_probe WIN32 relay_launch_probe.cpp)
@@ -615,9 +615,9 @@ if(WIN32)
     target_compile_features(relay_launch_probe PRIVATE cxx_std_20)
 
     target_compile_definitions(callback_relay_process_test PRIVATE
-        RPI_IMAGER_RELAY_EXE="$<TARGET_FILE:rpi-imager-callback-relay>"
+        RPI_IMAGER_RELAY_EXE="$<TARGET_FILE:vbase-imager-callback-relay>"
         RPI_RELAY_LAUNCH_PROBE="$<TARGET_FILE:relay_launch_probe>")
-    add_dependencies(callback_relay_process_test rpi-imager-callback-relay
+    add_dependencies(callback_relay_process_test vbase-imager-callback-relay
                      relay_launch_probe)
     target_compile_features(callback_relay_process_test PRIVATE cxx_std_20)
     # Every case binds the relay's fixed port, so two at once means one of
@@ -1856,12 +1856,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # it needs the screenshot hook, which is compiled out unless a test build
     # asks for it (-DENABLE_TEST_HOOKS=ON). Not a CTest test: it wants fonts and
     # several seconds per profile, and its output is meant to be looked at.
-    if(TARGET rpi-imager AND BUILD_EMBEDDED AND ENABLE_TEST_HOOKS)
+    if(TARGET vbase-imager AND BUILD_EMBEDDED AND ENABLE_TEST_HOOKS)
         add_custom_target(screenshots_embedded_scaling
             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/embedded_scaling/screenshots.sh
-                    $<TARGET_FILE:rpi-imager>
+                    $<TARGET_FILE:vbase-imager>
                     ${CMAKE_CURRENT_BINARY_DIR}/embedded_scaling_screenshots
-            DEPENDS rpi-imager
+            DEPENDS vbase-imager
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Rendering the embedded UI at each display profile"
         )
@@ -1873,12 +1873,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # about the panel. Its output is what the AppStream metainfo and the store
     # listings point at, which is why it is a target you run and look at rather
     # than a CTest test.
-    if(TARGET rpi-imager AND NOT BUILD_EMBEDDED AND ENABLE_TEST_HOOKS)
+    if(TARGET vbase-imager AND NOT BUILD_EMBEDDED AND ENABLE_TEST_HOOKS)
         add_custom_target(screenshots_desktop
             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/screenshots/shots.sh
-                    $<TARGET_FILE:rpi-imager>
+                    $<TARGET_FILE:vbase-imager>
                     ${CMAKE_CURRENT_BINARY_DIR}/desktop_screenshots
-            DEPENDS rpi-imager
+            DEPENDS vbase-imager
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Rendering the desktop UI, one PNG per wizard page"
         )
@@ -3130,7 +3130,7 @@ target_link_libraries(screenshot_pages_test PRIVATE
 target_compile_definitions(screenshot_pages_test PRIVATE
     SCREENSHOT_PAGES_FILE="${CMAKE_CURRENT_SOURCE_DIR}/screenshots/pages.txt"
     WIZARD_CONTAINER_QML="${CMAKE_CURRENT_SOURCE_DIR}/../wizard/WizardContainer.qml"
-    METAINFO_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../debian/com.raspberrypi.rpi-imager.metainfo.xml.in"
+    METAINFO_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../debian/com.onecomet.vbase-imager.metainfo.xml.in"
 )
 
 target_compile_features(screenshot_pages_test PRIVATE cxx_std_20)

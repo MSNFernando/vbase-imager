@@ -1453,7 +1453,7 @@ Item {
                 root.piConnectEnabled = false
         }
         
-        // Handle repository URL received from deep link (rpi-imager://open?repo=...)
+        // Handle repository URL received from deep link (vbase-imager://open?repo=...)
         function onRepositoryUrlReceived(url) {
             repositoryUrlDialog.openWithUrl(url)
         }

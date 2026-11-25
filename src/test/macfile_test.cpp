@@ -142,7 +142,7 @@ TEST_CASE("Repeated successful opens do not leak descriptors", "[macfile]")
 
 TEST_CASE("A helper that is not there is refused", "[macfile]")
 {
-    const char *missing = "/usr/libexec/rpi-imager-no-such-helper";
+    const char *missing = "/usr/libexec/vbase-imager-no-such-helper";
     const char *argv[] = {missing, nullptr};
     CHECK(openViaHelper(missing, argv, "auth") == -1);
 }

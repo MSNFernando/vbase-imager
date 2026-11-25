@@ -2,8 +2,8 @@
 set -e
 
 # Script to create a .deb package for embedded systems using linuxfb as a renderer.
-# The .deb installs a vendored directory tree under /opt/rpi-imager-embedded/ with
-# a wrapper script at /usr/bin/rpi-imager-embedded.
+# The .deb installs a vendored directory tree under /opt/vbase-imager-embedded/ with
+# a wrapper script at /usr/bin/vbase-imager-embedded.
 
 # Source common build functions for ICU version detection
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -33,7 +33,7 @@ usage() {
     echo ""
     echo "This script creates a .deb optimised for embedded systems:"
     echo "  - Uses linuxfb for direct rendering (no X11/Wayland required)"
-    echo "  - All dependencies vendored under /opt/rpi-imager-embedded/"
+    echo "  - All dependencies vendored under /opt/vbase-imager-embedded/"
     echo "  - Smaller size by excluding desktop-specific libraries"
     echo ""
     echo "Font Configuration:"
@@ -119,7 +119,7 @@ else
     echo "Warning: Could not parse version from git tag: $GIT_VERSION"
 fi
 
-echo "Building rpi-imager version $GIT_VERSION (numeric: $PROJECT_VERSION) for embedded systems"
+echo "Building vbase-imager version $GIT_VERSION (numeric: $PROJECT_VERSION) for embedded systems"
 
 QT_VERSION=""
 QT_DIR=""
@@ -201,7 +201,7 @@ BUILD_TYPE="MinSizeRel"  # Optimize for size in embedded systems
 
 # .deb staging root and output path
 DEBDIR="$PWD/debroot-embedded-$ARCH"
-OPTDIR="$DEBDIR/opt/rpi-imager-embedded"
+OPTDIR="$DEBDIR/opt/vbase-imager-embedded"
 
 # Map arch to dpkg architecture name
 case "$ARCH" in
@@ -225,7 +225,7 @@ mkdir -p "$OPTDIR/lib"
 mkdir -p "$DEBDIR/usr/bin"
 mkdir -p "$BUILD_DIR"
 
-echo "Building rpi-imager for embedded $ARCH..."
+echo "Building vbase-imager for embedded $ARCH..."
 # Configure and build with CMake
 cd "$BUILD_DIR"
 
@@ -262,12 +262,12 @@ cd ..
 echo "Populating .deb staging tree..."
 
 # Copy binary directly from build directory
-cp "$BUILD_DIR/rpi-imager" "$OPTDIR/bin/rpi-imager"
+cp "$BUILD_DIR/vbase-imager" "$OPTDIR/bin/vbase-imager"
 
 # Create the wrapper script
-cat > "$DEBDIR/usr/bin/rpi-imager-embedded" << 'EOF'
+cat > "$DEBDIR/usr/bin/vbase-imager-embedded" << 'EOF'
 #!/bin/sh
-HERE="/opt/rpi-imager-embedded"
+HERE="/opt/vbase-imager-embedded"
 
 # Set up paths
 export PATH="${HERE}/bin:${PATH}"
@@ -302,12 +302,12 @@ export QSG_ATLAS_WIDTH=0
 export QSG_ATLAS_HEIGHT=0
 export QT_QPA_FB_DRM=/dev/dri/card1
 
-exec "${HERE}/bin/rpi-imager" "$@"
+exec "${HERE}/bin/vbase-imager" "$@"
 EOF
-chmod +x "$DEBDIR/usr/bin/rpi-imager-embedded"
+chmod +x "$DEBDIR/usr/bin/vbase-imager-embedded"
 
 # ---------------------------------------------------------------------------
-# Deploy vendored dependencies into /opt/rpi-imager-embedded/
+# Deploy vendored dependencies into /opt/vbase-imager-embedded/
 # ---------------------------------------------------------------------------
 
 echo "Deploying Qt dependencies for embedded systems..."
@@ -524,7 +524,7 @@ cat > "$OPTDIR/etc/fonts/local.conf" << 'FONTCONFIG_EOF'
     </match>
 
     <!-- Cache directory for font cache -->
-    <cachedir>/tmp/fontconfig-cache-rpi-imager</cachedir>
+    <cachedir>/tmp/fontconfig-cache-vbase-imager</cachedir>
 </fontconfig>
 FONTCONFIG_EOF
 
@@ -598,11 +598,11 @@ fi
 # generated. dh_shlibdeps is deliberately NOT used: this package vendors Qt and
 # its support libraries under /opt, and shlibdeps would demand from the target
 # the very libraries bundled to avoid that. The external Depends are therefore
-# maintained explicitly in debian/control's rpi-imager-embedded stanza.
+# maintained explicitly in debian/control's vbase-imager-embedded stanza.
 # ---------------------------------------------------------------------------
 echo "Assembling embedded .deb via debhelper..."
 
-_pkg=rpi-imager-embedded
+_pkg=vbase-imager-embedded
 _stage="$TOP/debian/$_pkg"
 
 # Populate the debhelper install tree from the vendored staging root.

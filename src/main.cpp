@@ -395,8 +395,8 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    app.setOrganizationName("vBase");
-    app.setOrganizationDomain("github.com/MSNFernando");
+    app.setOrganizationName("ONECOMET");
+    app.setOrganizationDomain("onecomet.com");
     app.setApplicationName("vBase Imager");
     app.setApplicationVersion(ImageWriter::staticVersion());
     {
@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
     // Create ImageWriter early to check embedded mode
     ImageWriter imageWriter(nullptr);
 
-    // Register as the handler for the rpi-imager:// URL scheme so the Raspberry
+    // Register as the handler for the vbase-imager:// URL scheme so the Raspberry
     // Pi Connect sign-in callback can route back to us. Platform mechanics live
     // in the PAL (desktop file on Linux, Launch Services on macOS, installer on
     // Windows). Skipped in embedded mode, which has no desktop environment.
@@ -570,9 +570,9 @@ int main(int argc, char *argv[])
         {"enable-secure-boot", "Force enable secure boot customization step regardless of OS capabilities"}
     });
 
-    // Accept rpi-imager:// callback URLs as positional argument (used by callback relay on Windows)
+    // Accept vbase-imager:// callback URLs as positional argument (used by callback relay on Windows)
     // Note: This is NOT for passing image files - use --cli mode for that
-    parser.addPositionalArgument("callback-url", "rpi-imager:// callback URL (internal use)", "[callback-url]");
+    parser.addPositionalArgument("callback-url", "vbase-imager:// callback URL (internal use)", "[callback-url]");
     parser.process(app);
 
 
@@ -666,7 +666,7 @@ int main(int argc, char *argv[])
         ImageWriter::setForceSecureBootEnabled(true);
     }
 
-    // Accept rpi-imager:// callback URLs or manifest files (.rpi-imager-manifest, .json) as positional argument
+    // Accept vbase-imager:// callback URLs or manifest files (.vbase-imager-manifest, .json) as positional argument
     // Image files/URLs should be passed via --cli mode, not the desktop GUI
     const QStringList posArgs = parser.positionalArguments();
     if (!posArgs.isEmpty())
@@ -677,7 +677,7 @@ int main(int argc, char *argv[])
         if (posUrl.isLocalFile())
             firstPos = posUrl.toLocalFile();
 
-        if (firstPos.startsWith("rpi-imager:", Qt::CaseInsensitive))
+        if (firstPos.startsWith("vbase-imager:", Qt::CaseInsensitive))
         {
             callbackUrl = QUrl(firstPos);
         }
@@ -711,15 +711,15 @@ int main(int argc, char *argv[])
             QDBusInterface interface("org.freedesktop.DBus", "/org/freedesktop/DBus",
                                     "org.freedesktop.DBus", bus);
             QDBusReply<QStringList> reply = interface.call("ListNames");
-            if (reply.isValid() && reply.value().contains("com.raspberrypi.rpi-imager"))
+            if (reply.isValid() && reply.value().contains("com.onecomet.vbase-imager"))
             {
                 // Another instance is running - send callback URL to it via D-Bus
-                QDBusInterface iface("com.raspberrypi.rpi-imager", "/com/raspberrypi/rpi_imager",
-                                   "com.raspberrypi.rpi-imager", bus);
+                QDBusInterface iface("com.onecomet.vbase-imager", "/com/onecomet/vbase_imager",
+                                   "com.onecomet.vbase-imager", bus);
                 QDBusMessage msg = QDBusMessage::createMethodCall(
-                    "com.raspberrypi.rpi-imager",
-                    "/com/raspberrypi/rpi_imager",
-                    "com.raspberrypi.rpi-imager",
+                    "com.onecomet.vbase-imager",
+                    "/com/onecomet/vbase_imager",
+                    "com.onecomet.vbase-imager",
                     "HandleUrl");
                 msg << callbackUrl.toString();
                 QDBusReply<void> callReply = bus.call(msg);
@@ -766,9 +766,9 @@ int main(int argc, char *argv[])
     {
         QObject *dbusObject = new QObject(&app);
         UriHandlerAdaptor *adaptor = new UriHandlerAdaptor(&imageWriter, dbusObject);
-        if (bus.registerObject("/com/raspberrypi/rpi_imager", dbusObject))
+        if (bus.registerObject("/com/onecomet/vbase_imager", dbusObject))
         {
-            if (bus.registerService("com.raspberrypi.rpi-imager"))
+            if (bus.registerService("com.onecomet.vbase-imager"))
             {
                 qDebug() << "Registered D-Bus service for URI callbacks";
             }
@@ -986,7 +986,7 @@ int main(int argc, char *argv[])
         QString statusAndAction = {};
 
 #ifdef Q_OS_LINUX
-        // Get the actual executable name (e.g., AppImage name or 'rpi-imager')
+        // Get the actual executable name (e.g., AppImage name or 'vbase-imager')
         // Check if running from AppImage first
         QString execName;
         QByteArray appImagePath = qgetenv("APPIMAGE");

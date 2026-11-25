@@ -38,7 +38,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-perfstats-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-perfstats-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);
@@ -526,7 +526,7 @@ TEST_CASE("PerformanceStats reports a failed export rather than pretending", "[p
 
     // A directory that does not exist cannot be opened for writing.
     CHECK_FALSE(stats.exportToFile(
-        QStringLiteral("/nonexistent-rpi-imager-dir/deeper/still/stats.json")));
+        QStringLiteral("/nonexistent-vbase-imager-dir/deeper/still/stats.json")));
 }
 
 TEST_CASE("PerformanceStats distinguishes imaging data from any data", "[perfstats]")

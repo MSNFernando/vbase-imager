@@ -226,7 +226,7 @@ QString trustedCacheLocation()
         return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
 
     // Only root can create it here, so nobody else can have planted it.
-    static const char dir[] = "/var/cache/rpi-imager";
+    static const char dir[] = "/var/cache/vbase-imager";
     ::mkdir(dir, 0700);
     struct stat st{};
     if (::lstat(dir, &st) != 0 || !S_ISDIR(st.st_mode) || st.st_uid != 0)

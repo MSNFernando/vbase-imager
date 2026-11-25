@@ -72,7 +72,7 @@ public:
                        Lifetime lifetime = HandleBound)
     {
         _file = QDir(QDir::tempPath()).filePath(
-            QStringLiteral("rpi-imager-test-%1.vhd")
+            QStringLiteral("vbase-imager-test-%1.vhd")
                 .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
 
         // Defined here rather than taken from virtdisk.h: DEFINE_GUID only

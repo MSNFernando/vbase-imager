@@ -1,11 +1,11 @@
-.TH RPI\-IMAGER 1
+.TH VBASE\-IMAGER 1
 .
 .SH NAME
-rpi\-imager \- Flash disk images to removable storage
+vbase\-imager \- Flash disk images to removable storage
 .
 .
 .SH SYNOPSIS
-.SY rpi\-imager
+.SY vbase\-imager
 .OP \-\-debug
 .OP \-\-repo url
 .OP \-\-qm translations
@@ -14,7 +14,7 @@ rpi\-imager \- Flash disk images to removable storage
 .OP image-uri
 .YS
 .
-.SY rpi\-imager
+.SY vbase\-imager
 \-\-cli
 .OP \-\-debug
 .OP \-\-quiet
@@ -25,17 +25,17 @@ image-uri
 destination-device
 .YS
 .
-.SY rpi\-imager
+.SY vbase\-imager
 \-\-version
 .YS
 .
-.SY rpi\-imager
+.SY vbase\-imager
 \-\-help
 .YS
 .
 .
 .SH DESCRIPTION
-.B rpi\-imager
+.B vbase\-imager
 is a utility for writing a disk image file, which may optionally be compressed,
 to a removable destination disk, such as a micro-SD card or a USB-attached SSD
 drive.
@@ -159,15 +159,15 @@ Only valid when run with
 .
 .SH EXAMPLES
 .TP
-.B rpi\-imager
+.B vbase\-imager
 Launch the graphical interface.
 .
 .TP
-.B rpi\-imager \-\-repo http://localhost:8080/os_list_utility.json
+.B vbase\-imager \-\-repo http://localhost:8080/os_list_utility.json
 Test a locally hosted version of the OS list with the graphical interface.
 .
 .TP
-.B rpi\-imager \-\-cli \-\-disable\-verify test.img /dev/mmcblk0
+.B vbase\-imager \-\-cli \-\-disable\-verify test.img /dev/mmcblk0
 Write
 .I test.img
 to
@@ -176,7 +176,7 @@ without any verification of the image itself, and no check that the image
 flashed correctly. This also avoids launching the graphical interface.
 .
 .TP
-.B rpi\-imager \-\-cli \-\-secure\-boot\-key ~/secure\-boot\-key.pem raspios.img /dev/mmcblk0
+.B vbase\-imager \-\-cli \-\-secure\-boot\-key ~/secure\-boot\-key.pem raspios.img /dev/mmcblk0
 Write
 .I raspios.img
 to
@@ -186,7 +186,7 @@ and sign the boot partition with the RSA private key located at
 This enables Raspberry Pi secure boot verification.
 .
 .TP
-.B rpi\-imager \-\-enable\-secure\-boot
+.B vbase\-imager \-\-enable\-secure\-boot
 Launch the graphical interface with secure boot customization step enabled for all
 operating systems, regardless of their declared capabilities. The RSA key must still
 be configured in the App Options dialog.

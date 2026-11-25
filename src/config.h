@@ -12,10 +12,10 @@
 #define OSLIST_URL                              "https://raw.githubusercontent.com/MSNFernando/vbase-releases/main/os_list.json"
 
 /* Custom repository manifest file extension (without leading dot) */
-#define MANIFEST_EXTENSION                      "rpi-imager-manifest"
+#define MANIFEST_EXTENSION                      "vbase-imager-manifest"
 
 /* MIME type for manifest files */
-#define MANIFEST_MIME_TYPE                      "application/vnd.raspberrypi.imager-manifest+json"
+#define MANIFEST_MIME_TYPE                      "application/vnd.onecomet.vbase-imager-manifest+json"
 
 /* Time synchronization URL (only used on linuxfb QPA platform, URL must be HTTP) */
 #define TIME_URL                                "http://github.com/"

@@ -123,7 +123,7 @@ TEST_CASE("A settings file that could not be created is not called secured",
         SKIP("Q: exists on this machine, so it is not an unwritable path");
 
     const auto result = rpi_imager::secureSettingsFile(
-        QStringLiteral("Q:/rpi-imager-no-such-volume/Imager.conf"));
+        QStringLiteral("Q:/vbase-imager-no-such-volume/Imager.conf"));
 
     CHECK_FALSE(result.created);
     CHECK_FALSE(result.secured);
@@ -157,12 +157,12 @@ TEST_CASE("Registry-backed settings leave nothing on the system drive",
     // #1771: the registry key name was taken as a path and left
     // C:\HKEY_CURRENT_USER\Software\Raspberry Pi\Raspberry Pi Imager behind.
     const QString key = QSettings(QSettings::NativeFormat, QSettings::UserScope,
-                                  QStringLiteral("rpi-imager-test"),
+                                  QStringLiteral("vbase-imager-test"),
                                   QStringLiteral("settings-perms-1771"))
                             .fileName();
     REQUIRE(key.startsWith(QStringLiteral("\\HKEY_CURRENT_USER\\")));
     const QString strayDir =
-        QDir::rootPath() + QStringLiteral("HKEY_CURRENT_USER/Software/rpi-imager-test");
+        QDir::rootPath() + QStringLiteral("HKEY_CURRENT_USER/Software/vbase-imager-test");
 
     const auto result = rpi_imager::secureSettingsFile(key);
 

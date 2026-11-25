@@ -35,7 +35,7 @@ TestCase {
 
     // Nothing can open a path below a name that is not a directory, so a
     // write that escaped every other lock would still fail to reach a disk.
-    readonly property string fakePrefix: "/dev/null/rpi-imager-chaos-"
+    readonly property string fakePrefix: "/dev/null/vbase-imager-chaos-"
 
     property int rngState: 1
     property bool writeStarted: false
@@ -128,7 +128,7 @@ TestCase {
             { device: fakePrefix + "blankname", description: "      ",
               size: 16000000000 },
             { device: fakePrefix + "markup",
-              description: "<b>SD</b> <img src=\"rpi-imager-chaos-beacon.png\"/> "
+              description: "<b>SD</b> <img src=\"vbase-imager-chaos-beacon.png\"/> "
                            + "\u202E drac ",
               size: 8000000000 },
 
@@ -203,7 +203,7 @@ TestCase {
         // A description is a device's own firmware talking. Drawn as rich
         // text, the <img> in the one above is fetched, and the fetch is the
         // disclosure. Nothing may ask for that name.
-        failOnWarning(/rpi-imager-chaos-beacon/)
+        failOnWarning(/vbase-imager-chaos-beacon/)
         failOnWarning(/TypeError/)
         failOnWarning(/ReferenceError/)
         failOnWarning(/Binding loop/)

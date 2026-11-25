@@ -53,7 +53,7 @@ if (IMAGER_SIGNED_APP)
 
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND "${SIGNTOOL}" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a
-                "${CMAKE_BINARY_DIR}/rpi-imager-callback-relay.exe")
+                "${CMAKE_BINARY_DIR}/vbase-imager-callback-relay.exe")
 
     # inf2cat.exe is always x86 regardless of host/target architecture
     find_program(INF2CAT
@@ -130,13 +130,13 @@ add_custom_command(TARGET ${PROJECT_NAME}
     COMMAND ${CMAKE_COMMAND} -E copy
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.exe"
         "${CMAKE_SOURCE_DIR}/../license.txt"
-        "${CMAKE_SOURCE_DIR}/windows/rpi-imager-cli.cmd"
-        "${CMAKE_BINARY_DIR}/rpi-imager-callback-relay.exe"
+        "${CMAKE_SOURCE_DIR}/windows/vbase-imager-cli.cmd"
+        "${CMAKE_BINARY_DIR}/vbase-imager-callback-relay.exe"
         "${CMAKE_BINARY_DIR}/deploy")
 
 add_custom_command(TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND "${WINDEPLOYQT}" --no-translations --no-widgets --skip-plugin-types qmltooling --exclude-plugins qtiff,qwebp,qgif --no-quickcontrols2fusion --no-quickcontrols2fusionstyleimpl --no-quickcontrols2universal --no-quickcontrols2universalstyleimpl --no-quickcontrols2imagine --no-quickcontrols2imaginestyleimpl --no-quickcontrols2fluentwinui3styleimpl --no-quickcontrols2windowsstyleimpl --verbose 2 --qmldir "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/deploy/rpi-imager.exe")
+    COMMAND "${WINDEPLOYQT}" --no-translations --no-widgets --skip-plugin-types qmltooling --exclude-plugins qtiff,qwebp,qgif --no-quickcontrols2fusion --no-quickcontrols2fusionstyleimpl --no-quickcontrols2universal --no-quickcontrols2universalstyleimpl --no-quickcontrols2imagine --no-quickcontrols2imaginestyleimpl --no-quickcontrols2fluentwinui3styleimpl --no-quickcontrols2windowsstyleimpl --verbose 2 --qmldir "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/deploy/vbase-imager.exe")
 
 # NSIS or Inno Setup configuration
 option(ENABLE_INNO_INSTALLER "Build Inno Setup installer instead of NSIS" OFF)
@@ -154,17 +154,17 @@ if(ENABLE_INNO_INSTALLER)
 
     # Configure .iss at build time so the version matches the binary
     add_custom_command(
-        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.iss"
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.iss"
         COMMAND ${CMAKE_COMMAND}
             -DVERSION_VARS_FILE=${IMAGER_VERSION_VARS}
             -DEXTRA_VARS_FILE=${_installer_extra_vars}
-            -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.iss.in
-            -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.iss
+            -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.iss.in
+            -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.iss
             -P ${CONFIGURE_VERSIONED_SCRIPT}
         DEPENDS
             ${IMAGER_VERSION_VARS}
-            ${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.iss.in
-        COMMENT "Configuring rpi-imager.iss with build-time version"
+            ${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.iss.in
+        COMMENT "Configuring vbase-imager.iss with build-time version"
         VERBATIM
     )
 
@@ -176,14 +176,14 @@ if(ENABLE_INNO_INSTALLER)
     if(INNO_COMPILER)
         if(IMAGER_SIGNED_APP)
             add_custom_target(inno_installer
-                COMMAND "${INNO_COMPILER}" "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.iss" "/DSIGNING_ENABLED" "/Ssign=${SIGNTOOL} sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p"
-                DEPENDS ${PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.iss"
+                COMMAND "${INNO_COMPILER}" "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.iss" "/DSIGNING_ENABLED" "/Ssign=${SIGNTOOL} sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p"
+                DEPENDS ${PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.iss"
                 COMMENT "Building Inno Setup installer"
                 VERBATIM)
         else()
             add_custom_target(inno_installer
-                COMMAND "${INNO_COMPILER}" "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.iss"
-                DEPENDS ${PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.iss"
+                COMMAND "${INNO_COMPILER}" "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.iss"
+                DEPENDS ${PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.iss"
                 COMMENT "Building Inno Setup installer"
                 VERBATIM)
         endif()
@@ -192,20 +192,20 @@ if(ENABLE_INNO_INSTALLER)
         message(WARNING "Inno Setup compiler not found. Install Inno Setup from https://jrsoftware.org/isinfo.php")
     endif()
 else()
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.nsi.in")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.nsi.in")
         # Configure .nsi at build time so the version matches the binary
         add_custom_command(
-            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.nsi"
+            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.nsi"
             COMMAND ${CMAKE_COMMAND}
                 -DVERSION_VARS_FILE=${IMAGER_VERSION_VARS}
                 -DEXTRA_VARS_FILE=${_installer_extra_vars}
-                -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.nsi.in
-                -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.nsi
+                -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.nsi.in
+                -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.nsi
                 -P ${CONFIGURE_VERSIONED_SCRIPT}
             DEPENDS
                 ${IMAGER_VERSION_VARS}
-                ${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.nsi.in
-            COMMENT "Configuring rpi-imager.nsi with build-time version"
+                ${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.nsi.in
+            COMMENT "Configuring vbase-imager.nsi with build-time version"
             VERBATIM
         )
     else()
@@ -217,40 +217,40 @@ endif()
 # in sync with the binary even without a re-configure.
 # Manifest must be generated before the .rc (which embeds it via RT_MANIFEST)
 add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.manifest"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.manifest"
     COMMAND ${CMAKE_COMMAND}
         -DVERSION_VARS_FILE=${IMAGER_VERSION_VARS}
-        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.manifest.in
-        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.manifest
+        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.manifest.in
+        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.manifest
         -P ${CONFIGURE_VERSIONED_SCRIPT}
     DEPENDS
         ${IMAGER_VERSION_VARS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.manifest.in
-    COMMENT "Configuring rpi-imager.manifest with build-time version"
+        ${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.manifest.in
+    COMMENT "Configuring vbase-imager.manifest with build-time version"
     VERBATIM
 )
 
 add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.rc"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.rc"
     COMMAND ${CMAKE_COMMAND}
         -DVERSION_VARS_FILE=${IMAGER_VERSION_VARS}
-        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.rc.in
-        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.rc
+        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.rc.in
+        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.rc
         -P ${CONFIGURE_VERSIONED_SCRIPT}
     DEPENDS
         ${IMAGER_VERSION_VARS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.rc.in
-        "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.manifest"
-    COMMENT "Configuring rpi-imager.rc with build-time version"
+        ${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.rc.in
+        "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.manifest"
+    COMMENT "Configuring vbase-imager.rc with build-time version"
     VERBATIM
 )
 
 add_custom_command(TARGET ${PROJECT_NAME}
     PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.manifest"
-        "${CMAKE_CURRENT_SOURCE_DIR}/windows/rpi-imager.manifest"
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/rpi-imager.manifest"
+        "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.manifest"
+        "${CMAKE_CURRENT_SOURCE_DIR}/windows/vbase-imager.manifest"
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/vbase-imager.manifest"
     COMMENT "Copying generated manifest for resource compilation")
 
 add_custom_command(TARGET ${PROJECT_NAME}

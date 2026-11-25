@@ -216,7 +216,7 @@ TEST_CASE("Device limits follow a symlink to the device", "[device_io_limits]")
     // A path that is not under /dev at all: the old form gave up before it
     // even looked, because the string did not start with "/dev/".
     const auto link = std::filesystem::temp_directory_path()
-                    / ("rpi-imager-devlink-" + std::to_string(::getpid()));
+                    / ("vbase-imager-devlink-" + std::to_string(::getpid()));
     std::error_code ec;
     std::filesystem::remove(link, ec);
     std::filesystem::create_symlink(device, link, ec);
@@ -272,7 +272,7 @@ TEST_CASE("A path that is not a block device reports nothing",
     // major:minor would land on some unrelated device. Zero means "unknown",
     // which is what the caller's fallback geometry is for.
     const auto file = std::filesystem::temp_directory_path()
-                    / ("rpi-imager-notadevice-" + std::to_string(::getpid()));
+                    / ("vbase-imager-notadevice-" + std::to_string(::getpid()));
     { std::ofstream f(file); f << "x"; }
 
     const auto limits = FileOperations::QueryDeviceIOLimits(file.string());
@@ -306,7 +306,7 @@ TEST_CASE("A path that is not a physical drive is not queried",
     // adapter descriptor.
     const std::string file =
         (std::filesystem::temp_directory_path()
-         / ("rpi-imager-notadrive-" + std::to_string(::GetCurrentProcessId()))).string();
+         / ("vbase-imager-notadrive-" + std::to_string(::GetCurrentProcessId()))).string();
     { std::ofstream f(file); f << "x"; }
 
     for (const std::string &path : {file, std::string(), std::string("\\\\.\\C:"),

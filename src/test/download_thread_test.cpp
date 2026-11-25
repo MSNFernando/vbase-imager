@@ -76,7 +76,7 @@ class ScratchDir
 {
 public:
     ScratchDir()
-        : _path(QDir::temp().filePath(QStringLiteral("rpi-imager-dl-%1")
+        : _path(QDir::temp().filePath(QStringLiteral("vbase-imager-dl-%1")
                                           .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))))
     {
         QDir().mkpath(_path);
@@ -217,7 +217,7 @@ TEST_CASE("DownloadThread accepts its configuration knobs", "[download]")
 
     // These are all plain setters, but they run before any thread starts and
     // a throw here would take down the caller.
-    CHECK_NOTHROW(dt.setUserAgent("rpi-imager-test/1.0"));
+    CHECK_NOTHROW(dt.setUserAgent("vbase-imager-test/1.0"));
     CHECK_NOTHROW(dt.setVerifyEnabled(false));
     CHECK_NOTHROW(dt.setInputBufferSize(64 * 1024));
     CHECK_NOTHROW(dt.setDebugDirectIO(false));
@@ -337,7 +337,7 @@ TEST_CASE("DownloadThread reports a source that does not exist", "[download]")
     const QString dest = scratch.filePath(QStringLiteral("unused.img"));
     REQUIRE(writeFile(dest, QByteArray(1024 * 1024, '\0')));
 
-    DownloadThread dt("file:///nonexistent-rpi-imager/missing.img", dest.toUtf8(), "");
+    DownloadThread dt("file:///nonexistent-vbase-imager/missing.img", dest.toUtf8(), "");
 
     const Outcome outcome = runToCompletion(*&dt);
     REQUIRE(outcome.finished);
@@ -352,7 +352,7 @@ TEST_CASE("DownloadThread reports a destination it cannot open", "[download]")
     REQUIRE(writeFile(source, patternOfSize(4096, 1)));
 
     DownloadThread dt(QUrl::fromLocalFile(source).toEncoded(),
-                      "/nonexistent-rpi-imager-dir/deeper/dest.img", "");
+                      "/nonexistent-vbase-imager-dir/deeper/dest.img", "");
 
     const Outcome outcome = runToCompletion(dt);
     REQUIRE(outcome.finished);
@@ -558,7 +558,7 @@ TEST_CASE("DownloadThread survives a cache file it cannot open", "[download][cac
 
     // An unwritable cache path must degrade to "no caching", not fail the
     // write: the user asked for an image on a card, not for a cache entry.
-    dt->setCacheFile(QStringLiteral("/nonexistent-rpi-imager-dir/deeper/cached.img"),
+    dt->setCacheFile(QStringLiteral("/nonexistent-vbase-imager-dir/deeper/cached.img"),
                      payload.size());
 
     const Outcome outcome = runToCompletion(*dt, 120000);
@@ -745,7 +745,7 @@ TEST_CASE("DownloadThread writes correctly with verbose logging", "[download][co
     // Verbose logging runs extra formatting on the hot path; it must not
     // change what is written.
     dt->setDebugVerboseLogging(true);
-    dt->setUserAgent("rpi-imager-test/1.0");
+    dt->setUserAgent("vbase-imager-test/1.0");
 
     const Outcome outcome = runToCompletion(*dt, 120000);
     REQUIRE(outcome.finished);
@@ -1065,7 +1065,7 @@ TEST_CASE("DownloadThread writes an image fetched over HTTP", "[download][http]"
 
     DownloadThread dt(server.urlFor(QStringLiteral("served.img")), dest.toUtf8(), QByteArray());
     dt.setVerifyEnabled(false);
-    dt.setUserAgent("rpi-imager-test/1.0");
+    dt.setUserAgent("vbase-imager-test/1.0");
 
     const Outcome outcome = runToCompletion(dt, kWriteTimeoutMs);
     INFO("error: " << outcome.errorMessage.toStdString());
@@ -1171,7 +1171,7 @@ TEST_CASE("A device node that has gone is reported, not waited on",
     const QString source = scratch.filePath(QStringLiteral("gone-source.img"));
     REQUIRE(writeFile(source, payload));
 
-    const QByteArray target = "/dev/nonexistent-rpi-imager-target";
+    const QByteArray target = "/dev/nonexistent-vbase-imager-target";
     REQUIRE_FALSE(QFileInfo::exists(QString::fromUtf8(target)));
 
     DownloadThread dt(QUrl::fromLocalFile(source).toEncoded(), target, QByteArray());
@@ -1196,7 +1196,7 @@ TEST_CASE("A device node that has gone is reported, not waited on",
 // fetcher restricts what a redirect may switch to; the image download leaves
 // it to libcurl's default, which excludes file, scp and smb. That difference
 // is easy to lose sight of, and what it protects is worth stating: a
-// repository, or an rpi-imager:// link somebody accepted, chooses the image
+// repository, or an vbase-imager:// link somebody accepted, chooses the image
 // URL, and a redirect from it into file:// would have the writer read a local
 // file and put it on the card.
 
@@ -1635,7 +1635,7 @@ TEST_CASE("Secure boot keeps every cloud-init file and not just the first",
     CHECK(networkOnCard == networkData);
     // meta-data carries the instance-id cloud-init keys its cache on; an
     // empty one leaves the datasource undetectable.
-    CHECK(metaOnCard.contains("instance-id: rpi-imager-"));
+    CHECK(metaOnCard.contains("instance-id: vbase-imager-"));
 
     setConfiguredRsaKey(QString());
 }
@@ -1679,7 +1679,7 @@ TEST_CASE("DownloadThread refuses secure boot with a key that is not there",
         SKIP(rpi_test::noFatFormatterReason());
 
     ScratchDir scratch;
-    setConfiguredRsaKey(QStringLiteral("/nonexistent-rpi-imager-dir/absent.pem"));
+    setConfiguredRsaKey(QStringLiteral("/nonexistent-vbase-imager-dir/absent.pem"));
 
     const QString source = scratch.filePath(QStringLiteral("sb-gone-src.img"));
     REQUIRE(buildPartitionedImage(source, 48));
@@ -3815,7 +3815,7 @@ TEST_CASE("An interrupted download resumes and writes the whole image",
     DownloadThread dt(server.urlFor(QStringLiteral("flaky.img")), dest.toUtf8(),
                       QByteArray());
     dt.setVerifyEnabled(false);
-    dt.setUserAgent("rpi-imager-test/1.0");
+    dt.setUserAgent("vbase-imager-test/1.0");
     rpi_test::SignalLog retried(&dt, &DownloadThread::eventNetworkRetry);
 
     const Outcome outcome = runToCompletion(dt, kWriteTimeoutMs);
@@ -3876,7 +3876,7 @@ TEST_CASE("A download interrupted twice still writes the whole image",
     DownloadThread dt(server.urlFor(QStringLiteral("flaky2.img")), dest.toUtf8(),
                       QByteArray());
     dt.setVerifyEnabled(false);
-    dt.setUserAgent("rpi-imager-test/1.0");
+    dt.setUserAgent("vbase-imager-test/1.0");
 
     rpi_test::SignalLog retried(&dt, &DownloadThread::eventNetworkRetry);
 
@@ -4597,7 +4597,7 @@ TEST_CASE("A UNC path is corrected before curl is given it", "[download]")
         REQUIRE(f.write(QByteArray(1024 * 1024, '\0')) == 1024 * 1024);
     }
 
-    DownloadThread dt(QByteArray("file://rpi-imager-no-such-host/share/os.img"),
+    DownloadThread dt(QByteArray("file://vbase-imager-no-such-host/share/os.img"),
                       target.toUtf8(), QByteArray());
     dt.setVerifyEnabled(false);
 

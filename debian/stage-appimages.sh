@@ -116,14 +116,14 @@ link_artifact() {
 
 stage_desktop() {
 	img_arch=$(deb_arch_to_image_arch "$(target_deb_arch)")
-	canonical="rpi-imager-${img_arch}.AppImage"
+	canonical="vbase-imager-${img_arch}.AppImage"
 	src=$(resolve_artifact "$canonical" "Raspberry_Pi_Imager-*-desktop-${img_arch}.AppImage")
 	link_artifact "$canonical" "$src"
 }
 
 stage_cli() {
 	img_arch=$(deb_arch_to_image_arch "$(target_deb_arch)")
-	canonical="rpi-imager-cli-${img_arch}.AppImage"
+	canonical="vbase-imager-cli-${img_arch}.AppImage"
 	src=$(resolve_artifact "$canonical" "Raspberry_Pi_Imager-*-cli-${img_arch}.AppImage")
 	link_artifact "$canonical" "$src"
 }

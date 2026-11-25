@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2025 Raspberry Pi Ltd
  *
- * Native drive enumeration for rpi-imager.
+ * Native drive enumeration for vbase-imager.
  * Platform-specific implementations enumerate storage devices and populate
  * DeviceDescriptor structs with device properties.
  */
@@ -174,7 +174,7 @@ inline bool hasNonAsciiChars(const std::string& host)
 /**
  * @brief Describes a storage device discovered on the system
  *
- * This struct contains all information needed by rpi-imager to display
+ * This struct contains all information needed by vbase-imager to display
  * and filter storage devices for imaging operations.
  */
 struct DeviceDescriptor {
