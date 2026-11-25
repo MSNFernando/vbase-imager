@@ -73,13 +73,19 @@ BaseDialog {
             // Only include secure boot key button if visible
             if (secureBootKeyButton.visible)
                 items.push(secureBootKeyButton.focusItem)
-            items.push(chkConnectOrg.focusItem)
-            items.push(clearSettingsButton.focusItem)
+            // vBase Imager hides the Pi Connect, saved-customisation and
+            // telemetry options; only visible ones join the focus chain.
+            if (chkConnectOrg.visible)
+                items.push(chkConnectOrg.focusItem)
+            if (clearSettingsButton.visible)
+                items.push(clearSettingsButton.focusItem)
             // Telemetry pill (and its help link) sit at the bottom — see the
             // pill's own placement comment below.
-            items.push(chkTelemetry.focusItem)
-            if (chkTelemetry.helpLinkItem && chkTelemetry.helpLinkItem.visible)
-                items.push(chkTelemetry.helpLinkItem)
+            if (chkTelemetry.visible) {
+                items.push(chkTelemetry.focusItem)
+                if (chkTelemetry.helpLinkItem && chkTelemetry.helpLinkItem.visible)
+                    items.push(chkTelemetry.helpLinkItem)
+            }
             return items
         }, 1)
         registerFocusGroup("buttons", function(){ 
@@ -199,11 +205,8 @@ BaseDialog {
                 btnText: rsaKeyPath.text ? qsTr("Change") : qsTr("Select")
                 accessibleDescription: qsTr("Select an RSA 2048-bit private key for signing boot images in secure boot mode")
                 Layout.fillWidth: true
-                // Only show if secure boot is available (via OS capabilities or CLI flag)
-                visible: (popup.wizardContainer && popup.wizardContainer.secureBootAvailable) ||
-                         ImageWriterSingleton.isSecureBootForcedByCliFlag() ||
-                         ImageWriterSingleton.checkSWCapability("secure_boot") ||
-                         ImageWriterSingleton.getDebugForceSecureBoot()
+                // vBase Imager: Raspberry Pi secure boot signing does not apply.
+                visible: false
                 // Disable while write is in progress
                 enabled: ImageWriterSingleton.writeState === ImageWriterSingleton.Idle ||
                          ImageWriterSingleton.writeState === ImageWriterSingleton.Succeeded ||
@@ -244,6 +247,8 @@ BaseDialog {
                 accessibleDescription: qsTr("Enable the organisation-level Raspberry Pi Connect registration flow. When active, the Connect wizard step collects an organisation API key and registers each provisioned device with Connect.")
                 helpLabel: ImageWriterSingleton.isEmbeddedMode() ? "" : qsTr("What is this?")
                 helpUrl: ImageWriterSingleton.isEmbeddedMode() ? "" : "https://www.raspberrypi.com/software/connect/"
+                // vBase Imager: no Raspberry Pi Connect.
+                visible: false
                 Layout.fillWidth: true
                 Component.onCompleted: {
                     focusItem.activeFocusOnTab = true
@@ -262,6 +267,8 @@ BaseDialog {
                 accessibleDescription: popup.isWriting
                     ? qsTr("Clearing saved customisation is unavailable while a write is in progress")
                     : qsTr("Remove all saved OS customisation settings such as hostname, WiFi, and user credentials")
+                // vBase Imager has no OS customisation steps.
+                visible: false
                 Layout.fillWidth: true
                 Component.onCompleted: {
                     focusItem.activeFocusOnTab = true
@@ -281,6 +288,8 @@ BaseDialog {
                 accessibleDescription: qsTr("Send anonymous usage statistics to help improve Raspberry Pi Imager")
                 helpLabel: ImageWriterSingleton.isEmbeddedMode() ? "" : qsTr("What is this?")
                 helpUrl: ImageWriterSingleton.isEmbeddedMode() ? "" : "https://github.com/raspberrypi/rpi-imager?tab=readme-ov-file#anonymous-metrics-telemetry"
+                // vBase Imager: telemetry is compiled out.
+                visible: false
                 Layout.fillWidth: true
                 Component.onCompleted: {
                     focusItem.activeFocusOnTab = true
@@ -405,12 +414,7 @@ BaseDialog {
         // in main.qml — flipping "Force secure boot available" in Debug
         // Options afterwards wouldn't make the picker appear without a
         // forced re-bind here.
-        secureBootKeyButton.visible = Qt.binding(function() {
-            return (popup.wizardContainer && popup.wizardContainer.secureBootAvailable) ||
-                   ImageWriterSingleton.isSecureBootForcedByCliFlag() ||
-                   ImageWriterSingleton.checkSWCapability("secure_boot") ||
-                   ImageWriterSingleton.getDebugForceSecureBoot();
-        });
+        // vBase Imager: the Secure Boot RSA Key button stays hidden (no re-bind).
         // Raspberry Pi Connect for Organisations is a persisted
         // feature flag.  The API key itself lives in the wizard's
         // Connect step (session-only) so it is never written to

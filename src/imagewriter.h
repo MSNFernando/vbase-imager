@@ -185,7 +185,7 @@ public:
     Q_INVOKABLE QUrl osListUrl() const;
 
     // Where the repository starts, and where refreshOsListFromDefaultUrl()
-    // returns to. RPI_IMAGER_OSLIST_URL overrides it, as
+    // returns to. VBASE_IMAGER_OSLIST_URL overrides it, as
     // RPI_IMAGER_TELEMETRY_URL and RPI_IMAGER_CONNECT_URL override theirs and
     // for the same reason: a suite driving the real writer should not reach
     // production. The telemetry guards still compare the built-in constant,

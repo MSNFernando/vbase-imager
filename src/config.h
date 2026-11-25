@@ -7,8 +7,9 @@
  */
 
 
-/* Repository URL */
-#define OSLIST_URL                              "https://downloads.raspberrypi.com/os_list_imagingutility_v4.json"
+/* Repository URL: vBase installer releases only (vBase Imager fork).
+ * Override at runtime with the VBASE_IMAGER_OSLIST_URL environment variable. */
+#define OSLIST_URL                              "https://raw.githubusercontent.com/MSNFernando/vbase-releases/main/os_list.json"
 
 /* Custom repository manifest file extension (without leading dot) */
 #define MANIFEST_EXTENSION                      "rpi-imager-manifest"
@@ -17,7 +18,7 @@
 #define MANIFEST_MIME_TYPE                      "application/vnd.raspberrypi.imager-manifest+json"
 
 /* Time synchronization URL (only used on linuxfb QPA platform, URL must be HTTP) */
-#define TIME_URL                                "http://downloads.raspberrypi.com/"
+#define TIME_URL                                "http://github.com/"
 
 /* Raspberry Pi Connect API */
 #define CONNECT_API_URL                         "https://api.connect.raspberrypi.com"
@@ -27,8 +28,9 @@
  * an ID it does not know. */
 #define CONNECT_DEVICE_CLIENT_ID                "F0245915-2B1C-4FB4-86BC-15AEA995FE62"
 
-/* Phone home the name of images downloaded for image popularity ranking */
-#define TELEMETRY_URL                           "https://rpi-imager-stats.raspberrypi.com/downloads"
+/* Download-stats telemetry: compiled out in vBase Imager (see
+ * IMAGER_TELEMETRY_COMPILED_OUT in CMakeLists.txt), so there is no endpoint. */
+#define TELEMETRY_URL                           ""
 
 /* Hash algorithm for verifying (uncompressed image) checksum */
 #define OSLIST_HASH_ALGORITHM                   QCryptographicHash::Sha256

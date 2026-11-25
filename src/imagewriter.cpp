@@ -1170,6 +1170,10 @@ void ImageWriter::_startConfiguredWrite()
 // Where the download counter is reported, if anywhere.
 static QByteArray telemetryEndpoint()
 {
+#ifdef IMAGER_TELEMETRY_COMPILED_OUT
+    // vBase Imager: no download counter is ever posted anywhere.
+    return QByteArray();
+#else
     // "off" as well as empty, because empty cannot be expressed on Windows.
     // Setting a variable to an empty string there deletes it -- the CRT's
     // _putenv_s does, and so does the shell -- so a caller asking for silence
@@ -1186,6 +1190,7 @@ static QByteArray telemetryEndpoint()
         return value;
     }
     return QByteArray(TELEMETRY_URL);
+#endif
 }
 
 void ImageWriter::_configureWriteThread()
@@ -2234,7 +2239,7 @@ QUrl ImageWriter::osListUrl() const
 
 QUrl ImageWriter::defaultOsListUrl()
 {
-    const QString override = qEnvironmentVariable("RPI_IMAGER_OSLIST_URL");
+    const QString override = qEnvironmentVariable("VBASE_IMAGER_OSLIST_URL");
     if (!override.isEmpty())
         return QUrl(override);
     return QUrl(QString(OSLIST_URL));

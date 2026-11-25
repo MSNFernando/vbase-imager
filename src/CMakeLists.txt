@@ -5,7 +5,7 @@ include(cmake/GeneratedResource.cmake)
 
 cmake_minimum_required(VERSION 3.22)
 OPTION (ENABLE_CHECK_VERSION "Check for version updates" ON)
-OPTION (ENABLE_TELEMETRY "Enable sending telemetry" ON)
+OPTION (ENABLE_TELEMETRY "Enable sending telemetry (vBase Imager: off, compiled out)" OFF)
 OPTION (BUILD_EMBEDDED "Build for Embedded Imager" OFF)
 OPTION (BUILD_CLI_ONLY "Build CLI-only version without GUI components" OFF)
 # Test-only hooks, for src/test/embedded_scaling to drive and photograph the UI.
@@ -558,6 +558,7 @@ if(ENABLE_TELEMETRY)
     add_definitions(-DTELEMETRY_ENABLED_DEFAULT=true)
 else()
     add_definitions(-DTELEMETRY_ENABLED_DEFAULT=false)
+    add_definitions(-DIMAGER_TELEMETRY_COMPILED_OUT)
 endif()
 
 if(ENABLE_CHECK_VERSION)
