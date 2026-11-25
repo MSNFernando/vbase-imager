@@ -56,3 +56,79 @@ jobs:
           name: vBase-Imager-linux-x86_64
           path: vBase_Imager-*.AppImage
           if-no-files-found: error
+
+  windows:
+    name: Windows x64 (unsigned, zip)
+    runs-on: windows-2022
+    # Best effort for now: the Linux AppImage is the release gate.
+    continue-on-error: true
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Qt and MinGW
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: windows
+          target: desktop
+          arch: win64_mingw
+          tools: tools_mingw1310
+          cache: true
+
+      - name: Fetch vendored dependencies
+        run: sh debian/fetch-vendor-deps.sh
+
+      - name: Configure and build
+        run: |
+          MINGW="$(cygpath -m "$IQTA_TOOLS/mingw1310_64")"
+          export PATH="$(cygpath -u "$MINGW")/bin:$PATH"
+          cmake -S src -B build -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel \
+            -DQt6_ROOT="$(cygpath -m "$QT_ROOT_DIR")" -DMINGW64_ROOT="$MINGW" \
+            -DCMAKE_C_COMPILER="$MINGW/bin/gcc.exe" -DCMAKE_CXX_COMPILER="$MINGW/bin/g++.exe"
+          cmake --build build --parallel
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vBase-Imager-windows-x64
+          path: build/deploy/
+          if-no-files-found: error
+
+  macos:
+    name: macOS universal (unsigned DMG)
+    runs-on: macos-14
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          cache: true
+
+      - name: Fetch vendored dependencies
+        run: |
+          brew install ninja
+          sh debian/fetch-vendor-deps.sh
+
+      - name: Configure and build DMG
+        run: |
+          cmake -S src -B build -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel -DQt6_ROOT="$QT_ROOT_DIR"
+          cmake --build build --parallel
+          cmake --build build --target dmg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vBase-Imager-macos
+          path: build/*.dmg
+          if-no-files-found: error
