@@ -100,7 +100,7 @@ jobs:
 
   macos:
     name: macOS universal (unsigned DMG)
-    runs-on: macos-14
+    runs-on: macos-latest
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
