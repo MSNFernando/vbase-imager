@@ -27,10 +27,11 @@ ApplicationWindow {
     // Expose overlay root to child components for dialog parenting
     readonly property alias overlayRootItem: overlayRoot
 
-    width: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(680)
-    height: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(450)
-    minimumWidth: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(680)
-    minimumHeight: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(420)
+    // vBase Imager: sized for the three-step header (design board: 960 x 640)
+    width: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(900)
+    height: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(620)
+    minimumWidth: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(760)
+    minimumHeight: ImageWriterSingleton.isEmbeddedMode() ? -1 : Style.scaled(520)
 
     // Track custom repo host for title display
     property string customRepoHost: ImageWriterSingleton.customRepoHost()
