@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  vBase Imager, Windows: the artifact is the zip GitHub Actions uploads from build/deploy/.
+  Proposed for the SignPath project (artifact configurations live in SignPath; this copy is
+  kept here so it's reviewed with the code). Signs vBase Imager's own programs; Qt and the
+  other bundled libraries are left as their publishers shipped them.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file-set>
+      <include path="vbase-imager.exe" />
+      <include path="vbase-imager-cli.exe" min-matches="0" />
+      <include path="vbase-imager-callback-relay.exe" min-matches="0" />
+      <for-each>
+        <authenticode-sign />
+      </for-each>
+    </pe-file-set>
+  </zip-file>
+</artifact-configuration>

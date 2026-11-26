@@ -1,3 +1,21 @@
+# vBase Imager
+
+Writes a **vBase** installer USB stick: choose a release, choose the stick (32 GB or larger),
+and it downloads, checks, writes and verifies it. It lists only vBase releases, from
+[vbase-releases](https://github.com/MSNFernando/vbase-releases), and sends no telemetry.
+
+- Builds for Windows, macOS and Linux come from `.github/workflows/vbase-build.yml`.
+- How the release list is laid out: [VBASE.md](VBASE.md).
+- **Code signing (Windows):** Free code signing provided by [SignPath.io](https://signpath.io),
+  certificate by [SignPath Foundation](https://signpath.org). See
+  [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md), including the privacy statement.
+
+vBase Imager is a fork of [Raspberry Pi Imager](https://github.com/raspberrypi/rpi-imager)
+(Apache-2.0), with thanks. The vBase work is on the `vbase` branch; `main` follows upstream.
+Upstream's README follows.
+
+---
+
 # Raspberry Pi Imager
 
 ![](./screenshot.png)
