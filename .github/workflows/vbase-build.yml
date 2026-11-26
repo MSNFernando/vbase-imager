@@ -26,6 +26,11 @@ on:
         description: Sign the Windows build through SignPath (needs approval there)
         type: boolean
         default: false
+      only:
+        description: Build only one platform (saves CI minutes while working on it)
+        type: choice
+        options: [all, linux, windows, macos]
+        default: all
 
 permissions:
   contents: read
@@ -39,6 +44,7 @@ env:
 
 jobs:
   linux:
+    if: github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'linux'
     name: Linux AppImage (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -85,7 +91,9 @@ jobs:
   windows:
     name: Windows x64 (self-contained exe and zip)
     # not for ordinary pushes (Linux checks those)
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')
+    if: >-
+      (github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')) &&
+      (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'windows')
     runs-on: windows-2022
     env:
       SIGNPATH_READY: ${{ secrets.SIGNPATH_API_TOKEN != '' && vars.SIGNPATH_ORGANIZATION_ID != '' }}
@@ -188,21 +196,45 @@ jobs:
           echo "SFX_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "SFX_NUMERIC=${NUMERIC:-0.0.0}" >> "$GITHUB_ENV"
 
-      # rcedit from PowerShell: under Git Bash it failed with only "exit 127"
+      # The stub's icon and version details (rcedit, one change at a time so a failure says
+      # which), and its request for administrator rights: a manifest, added with the Windows
+      # SDK's mt.exe. PowerShell, not Git Bash, so Windows' own exit codes come back.
       - name: Give the stub its icon, version details and administrator request
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          & .\sfx\rcedit.exe sfx\7zSD.sfx `
-            --set-icon src\icons\vbase-imager.ico `
-            --set-requested-execution-level requireAdministrator `
-            --set-file-version "$env:SFX_NUMERIC.0" --set-product-version "$env:SFX_VERSION" `
-            --set-version-string ProductName "vBase Imager" `
-            --set-version-string FileDescription "vBase Imager" `
-            --set-version-string CompanyName "ONECOMET" `
-            --set-version-string LegalCopyright "Apache-2.0; based on Raspberry Pi Imager by Raspberry Pi Ltd" `
-            --set-version-string OriginalFilename "vbase-imager.exe"
-          if ($LASTEXITCODE -ne 0) { throw ("rcedit failed: exit 0x{0:X8}" -f $LASTEXITCODE) }
+          function Edit-Stub([string]$what, [string[]]$rceditArgs) {
+            & .\sfx\rcedit.exe sfx\7zSD.sfx @rceditArgs
+            if ($LASTEXITCODE -ne 0) { throw ("rcedit ({0}) failed: exit 0x{1:X8}" -f $what, $LASTEXITCODE) }
+            Write-Host "rcedit: $what done"
+          }
+          Edit-Stub 'version' @('--set-file-version', "$env:SFX_NUMERIC.0", '--set-product-version', "$env:SFX_VERSION",
+            '--set-version-string', 'ProductName', 'vBase Imager',
+            '--set-version-string', 'FileDescription', 'vBase Imager',
+            '--set-version-string', 'CompanyName', 'ONECOMET',
+            '--set-version-string', 'LegalCopyright', 'Apache-2.0; based on Raspberry Pi Imager by Raspberry Pi Ltd',
+            '--set-version-string', 'OriginalFilename', 'vbase-imager.exe')
+          Edit-Stub 'icon' @('--set-icon', 'src\icons\vbase-imager.ico')
+
+          $mt = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\mt.exe" | Sort-Object FullName | Select-Object -Last 1
+          if (-not $mt) { throw 'mt.exe (Windows SDK) not found' }
+          @'
+          <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+          <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+            <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+              <security><requestedPrivileges>
+                <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
+              </requestedPrivileges></security>
+            </trustInfo>
+            <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+              <application><supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/></application>
+            </compatibility>
+          </assembly>
+          '@ | Set-Content -Encoding utf8 sfx\admin.manifest
+          & $mt.FullName -nologo -manifest sfx\admin.manifest '-outputresource:sfx\7zSD.sfx;#1'
+          if ($LASTEXITCODE -ne 0) { throw ("mt.exe failed: exit 0x{0:X8}" -f $LASTEXITCODE) }
+          & $mt.FullName -nologo '-inputresource:sfx\7zSD.sfx;#1' -out:sfx\check.manifest
+          if (-not (Select-String -Quiet -Path sfx\check.manifest -Pattern 'requireAdministrator')) { throw 'The stub has no administrator request' }
           (Get-Item sfx\7zSD.sfx).VersionInfo | Format-List ProductName, FileVersion, ProductVersion
 
       - name: Pack the self-contained exe
@@ -248,7 +280,9 @@ jobs:
   macos:
     name: macOS universal (unsigned DMG)
     # not for ordinary pushes (Linux checks those)
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')
+    if: >-
+      (github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')) &&
+      (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'macos')
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
