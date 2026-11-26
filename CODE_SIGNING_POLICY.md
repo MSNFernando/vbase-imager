@@ -11,7 +11,7 @@ certificate, so Windows shows **SignPath Foundation** as the publisher.
 - Only builds made by this repository's GitHub Actions workflow
   (`.github/workflows/vbase-build.yml`) from the `vbase` branch. Nothing built on a
   developer's own computer is ever signed.
-- Only releases: a version tag (`v*`), or a run started by hand with *sign* chosen. Ordinary
+- Only releases: a vBase release tag (`vbase-v*`), or a run started by hand with *sign* chosen. Ordinary
   pushes are built unsigned.
 - Every signing request is approved by hand in SignPath before it's signed.
 - Signed: vBase Imager's own programs (`vbase-imager.exe` and the other `.exe` and `.dll`

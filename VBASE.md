@@ -68,8 +68,10 @@ builds report `1.0.0-dev-g<hash>`.
 
 `.github/workflows/vbase-build.yml` builds on every push to `vbase`:
 Linux x86_64 AppImage (`create-appimage.sh`, Qt 6.9 from install-qt-action),
-plus Windows and macOS jobs. All unsigned; artifacts are attached to the run
+plus Windows and macOS jobs; artifacts are attached to the run
 (`vbase-imager-linux-x86_64`, `vbase-imager-windows-x64`, `vbase-imager-macos`).
+Builds are unsigned, except that a `vbase-v*` tag (or a run started with "sign") sends the
+Windows build to SignPath once it's set up: see README.md and CODE_SIGNING_POLICY.md.
 
 ## Names the OS sees
 
@@ -77,7 +79,8 @@ The program is `vbase-imager` (`vbase-imager.exe`, `vBase Imager.app`,
 `vbase-imager-<version>-desktop-x86_64.AppImage`). Linux installs
 `vbase-imager.desktop`, the `vbase-imager` icon, AppStream id and polkit
 actions under `nz.co.onecomet.vbase-imager`; the macOS bundle id and D-Bus name
-are `nz.co.onecomet.vbase-imager`; the callback URL scheme is `vbase-imager://`.
+are `nz.co.onecomet.vbase-imager`. There is no URL scheme: upstream's exists only for
+Raspberry Pi Connect sign-in.
 Settings and caches live under organisation "ONECOMET", app "vBase Imager", so
 nothing is shared with Raspberry Pi Imager. Internal source, class and
 translation-catalogue names (`imagewriter.cpp`, `i18n/rpi-imager_*.ts`) keep

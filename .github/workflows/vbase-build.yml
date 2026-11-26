@@ -1,13 +1,13 @@
 # Builds vBase Imager for Linux, Windows and macOS. Windows releases are signed through
 # SignPath (SignPath Foundation's certificate; see CODE_SIGNING_POLICY.md): only for a
-# version tag (v*) or a run started by hand with "sign", only once the SignPath settings
+# vBase release tag (vbase-v*) or a run started by hand with "sign", only once the SignPath settings
 # exist, and each request is approved by hand in SignPath. Everything else is unsigned.
 name: vBase Imager build
 
 on:
   push:
     branches: [vbase]
-    tags: ['v*']
+    tags: ['vbase-v*']   # the plain v* tags are upstream's
   pull_request:
     branches: [vbase]
   workflow_dispatch:
@@ -117,7 +117,7 @@ jobs:
         id: sign
         if: >-
           env.SIGNPATH_READY == 'true' && github.event_name != 'pull_request' &&
-          (startsWith(github.ref, 'refs/tags/v') || inputs.sign)
+          (startsWith(github.ref, 'refs/tags/vbase-v') || inputs.sign)
         uses: signpath/github-action-submit-signing-request@v3.2
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
