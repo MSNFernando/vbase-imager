@@ -1,7 +1,13 @@
-# Builds vBase Imager for Linux, Windows and macOS. Windows releases are signed through
-# SignPath (SignPath Foundation's certificate; see CODE_SIGNING_POLICY.md): only for a
-# vBase release tag (vbase-v*) or a run started by hand with "sign", only once the SignPath settings
-# exist, and each request is approved by hand in SignPath. Everything else is unsigned.
+# vBase Imager builds.
+#
+#   push to vbase          Linux only: a quick check that it still builds
+#   pull request / by hand Linux, Windows and macOS
+#   tag vbase-v*           all three, the Windows build signed through SignPath (once set
+#                          up; each request approved by hand there), and a draft GitHub
+#                          release with the downloads and their SHA-256 sums
+#
+# The plain v* tags in this repository are upstream's and build nothing. Signing uses
+# SignPath Foundation's certificate: see CODE_SIGNING_POLICY.md.
 name: vBase Imager build
 
 on:
@@ -67,11 +73,11 @@ jobs:
 
   windows:
     name: Windows x64 (zip)
+    # not for ordinary pushes (Linux checks those)
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')
     runs-on: windows-2022
     env:
       SIGNPATH_READY: ${{ secrets.SIGNPATH_API_TOKEN != '' && vars.SIGNPATH_ORGANIZATION_ID != '' }}
-    # Best effort for now: the Linux AppImage is the release gate.
-    continue-on-error: true
     defaults:
       run:
         shell: bash
@@ -139,8 +145,9 @@ jobs:
 
   macos:
     name: macOS universal (unsigned DMG)
+    # not for ordinary pushes (Linux checks those)
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')
     runs-on: macos-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -171,3 +178,47 @@ jobs:
           name: vbase-imager-macos
           path: build/*.dmg
           if-no-files-found: error
+
+  # A vbase-v* tag: a draft release with the three downloads. A draft is seen only by
+  # people who can push here until someone publishes it.
+  release:
+    name: Draft GitHub release
+    if: startsWith(github.ref, 'refs/tags/vbase-v')
+    needs: [linux, windows, macos]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Draft the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#vbase-v}"
+          mkdir out
+          cp dist/vbase-imager-linux-x86_64/*.AppImage out/
+          if [ -d dist/vbase-imager-windows-x64-signed ]; then
+            WINDOWS="Windows: signed by SignPath Foundation (free code signing provided by SignPath.io, certificate by SignPath Foundation)."
+            (cd dist/vbase-imager-windows-x64-signed && zip -qr "$GITHUB_WORKSPACE/out/vbase-imager-$VERSION-windows-x64.zip" .)
+          else
+            WINDOWS="Windows: not signed yet, so SmartScreen warns when it's opened."
+            (cd dist/vbase-imager-windows-x64 && zip -qr "$GITHUB_WORKSPACE/out/vbase-imager-$VERSION-windows-x64-unsigned.zip" .)
+          fi
+          cp dist/vbase-imager-macos/*.dmg "out/vbase-imager-$VERSION-macos.dmg"
+          (cd out && sha256sum -- * > SHA256SUMS)
+          cat > notes.md <<NOTES
+          Writes the USB stick a vBase server boots from: choose a release, choose a stick of 32 GB or more, and it downloads, checks, writes and verifies it.
+
+          - Linux: x86_64 AppImage
+          - $WINDOWS
+          - macOS: universal DMG, not signed yet, so Gatekeeper warns when it's opened.
+
+          Check a download: \`sha256sum -c SHA256SUMS --ignore-missing\`
+          NOTES
+          gh release create "$TAG" out/* --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
+            --title "vBase Imager $VERSION" --notes-file notes.md
