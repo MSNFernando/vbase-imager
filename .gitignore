@@ -25,7 +25,7 @@ debian/files
 debian/*.substvars
 debian/debhelper**
 debian/tmp
-debian/com.onecomet.vbase-imager.metainfo.xml
+debian/nz.co.onecomet.vbase-imager.metainfo.xml
 
 # macOS
 .DS_Store

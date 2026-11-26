@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     app.setOrganizationName("ONECOMET");
-    app.setOrganizationDomain("onecomet.com");
+    app.setOrganizationDomain("onecomet.co.nz");
     app.setApplicationName("vBase Imager");
     app.setApplicationVersion(ImageWriter::staticVersion());
     {
@@ -506,14 +506,9 @@ int main(int argc, char *argv[])
     // Create ImageWriter early to check embedded mode
     ImageWriter imageWriter(nullptr);
 
-    // Register as the handler for the vbase-imager:// URL scheme so the Raspberry
-    // Pi Connect sign-in callback can route back to us. Platform mechanics live
-    // in the PAL (desktop file on Linux, Launch Services on macOS, installer on
-    // Windows). Skipped in embedded mode, which has no desktop environment.
-    if (!imageWriter.isEmbeddedMode())
-    {
-        PlatformQuirks::registerUriScheme();
-    }
+    // vBase Imager doesn't claim a URL scheme: upstream registers one only so the
+    // Raspberry Pi Connect sign-in can call back, and vBase has no Connect. (It used to
+    // write a handler file into the user's profile on every start.)
 
 #ifdef Q_OS_LINUX
     if (imageWriter.isEmbeddedMode()) {
@@ -711,15 +706,15 @@ int main(int argc, char *argv[])
             QDBusInterface interface("org.freedesktop.DBus", "/org/freedesktop/DBus",
                                     "org.freedesktop.DBus", bus);
             QDBusReply<QStringList> reply = interface.call("ListNames");
-            if (reply.isValid() && reply.value().contains("com.onecomet.vbase-imager"))
+            if (reply.isValid() && reply.value().contains("nz.co.onecomet.vbase-imager"))
             {
                 // Another instance is running - send callback URL to it via D-Bus
-                QDBusInterface iface("com.onecomet.vbase-imager", "/com/onecomet/vbase_imager",
-                                   "com.onecomet.vbase-imager", bus);
+                QDBusInterface iface("nz.co.onecomet.vbase-imager", "/nz/co/onecomet/vbase_imager",
+                                   "nz.co.onecomet.vbase-imager", bus);
                 QDBusMessage msg = QDBusMessage::createMethodCall(
-                    "com.onecomet.vbase-imager",
-                    "/com/onecomet/vbase_imager",
-                    "com.onecomet.vbase-imager",
+                    "nz.co.onecomet.vbase-imager",
+                    "/nz/co/onecomet/vbase_imager",
+                    "nz.co.onecomet.vbase-imager",
                     "HandleUrl");
                 msg << callbackUrl.toString();
                 QDBusReply<void> callReply = bus.call(msg);
@@ -766,9 +761,9 @@ int main(int argc, char *argv[])
     {
         QObject *dbusObject = new QObject(&app);
         UriHandlerAdaptor *adaptor = new UriHandlerAdaptor(&imageWriter, dbusObject);
-        if (bus.registerObject("/com/onecomet/vbase_imager", dbusObject))
+        if (bus.registerObject("/nz/co/onecomet/vbase_imager", dbusObject))
         {
-            if (bus.registerService("com.onecomet.vbase-imager"))
+            if (bus.registerService("nz.co.onecomet.vbase-imager"))
             {
                 qDebug() << "Registered D-Bus service for URI callbacks";
             }

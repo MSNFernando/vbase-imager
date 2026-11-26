@@ -29,7 +29,7 @@ static os_log_t drivelist_log() {
     static os_log_t log = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        log = os_log_create("com.onecomet.vbase-imager", "drivelist");
+        log = os_log_create("nz.co.onecomet.vbase-imager", "drivelist");
     });
     return log;
 }

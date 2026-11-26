@@ -3130,7 +3130,7 @@ target_link_libraries(screenshot_pages_test PRIVATE
 target_compile_definitions(screenshot_pages_test PRIVATE
     SCREENSHOT_PAGES_FILE="${CMAKE_CURRENT_SOURCE_DIR}/screenshots/pages.txt"
     WIZARD_CONTAINER_QML="${CMAKE_CURRENT_SOURCE_DIR}/../wizard/WizardContainer.qml"
-    METAINFO_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../debian/com.onecomet.vbase-imager.metainfo.xml.in"
+    METAINFO_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../debian/nz.co.onecomet.vbase-imager.metainfo.xml.in"
 )
 
 target_compile_features(screenshot_pages_test PRIVATE cxx_std_20)

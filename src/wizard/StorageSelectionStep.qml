@@ -17,7 +17,7 @@ WizardStepBase {
     id: root
     
     title: qsTr("Choose the USB stick")
-    subtitle: qsTr("Only removable drives are listed. Your computer's own disks never appear here. Use a stick of 32 GB or more (USB 3, from a known brand): the server keeps its settings and database on it.")
+    subtitle: qsTr("Only removable drives are listed. Use a stick of 32 GB or more (USB 3, from a known brand).")
     showNextButton: true
     nextButtonText: qsTr("Erase and write")
     nextButtonAccessibleDescription: qsTr("Erase the chosen USB stick and write the vBase installer to it. Tick the confirmation first.")

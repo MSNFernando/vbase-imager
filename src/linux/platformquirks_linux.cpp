@@ -852,9 +852,9 @@ static bool generatePolkitPolicyFilename(const char* appImagePath, char* buffer,
     QByteArray pathBytes(appImagePath);
     QByteArray hash = QCryptographicHash::hash(pathBytes, QCryptographicHash::Md5).toHex();
     
-    // Create filename: com.onecomet.vbase-imager.appimage-HASH.policy
+    // Create filename: nz.co.onecomet.vbase-imager.appimage-HASH.policy
     int written = std::snprintf(buffer, bufferSize, 
-        "com.onecomet.vbase-imager.appimage-%s.policy",
+        "nz.co.onecomet.vbase-imager.appimage-%s.policy",
         hash.left(12).constData());  // Use first 12 chars of hash
     
     return written > 0 && static_cast<size_t>(written) < bufferSize;
@@ -1000,7 +1000,7 @@ bool hasElevationPolicyInstalled() {
 // Internal helper to remove stale polkit policy files left behind when the
 // AppImage was moved, renamed, or deleted. Called during policy installation
 // (which runs as root) so we have write access to the polkit directories.
-// Only touches files matching our naming convention (com.onecomet.vbase-imager.appimage-*.policy).
+// Only touches files matching our naming convention (nz.co.onecomet.vbase-imager.appimage-*.policy).
 static void cleanupStalePolkitPolicies(const char* currentPath) {
     const QByteArray execPathTag("org.freedesktop.policykit.exec.path\">");
     const QByteArray closeTag("</annotate>");
@@ -1011,7 +1011,7 @@ static void cleanupStalePolkitPolicies(const char* currentPath) {
             continue;
 
         const QStringList policyFiles = dir.entryList(
-            QStringList() << QStringLiteral("com.onecomet.vbase-imager.appimage-*.policy"),
+            QStringList() << QStringLiteral("nz.co.onecomet.vbase-imager.appimage-*.policy"),
             QDir::Files);
 
         for (const QString& filename : policyFiles) {
@@ -1115,7 +1115,7 @@ static bool installPolkitPolicyForPath(const char* appImagePath) {
     // Generate unique action ID based on path hash
     QByteArray pathBytes(appImagePath);
     QByteArray hash = QCryptographicHash::hash(pathBytes, QCryptographicHash::Md5).toHex();
-    QString actionId = QString("com.onecomet.vbase-imager.appimage.%1").arg(QString::fromUtf8(hash.left(12)));
+    QString actionId = QString("nz.co.onecomet.vbase-imager.appimage.%1").arg(QString::fromUtf8(hash.left(12)));
     
     // Security: XML-escape the AppImage path to prevent XML injection attacks
     // An attacker-controlled path like "</annotate><evil>..." could break the XML

@@ -6,7 +6,7 @@
 [linux-armhf] vbase-imager-armhf.AppImage => /usr/bin/vbase-imager
 
 # Install PolicyKit policy for privilege escalation
-debian/com.onecomet.vbase-imager.policy /usr/share/polkit-1/actions/
+debian/nz.co.onecomet.vbase-imager.policy /usr/share/polkit-1/actions/
 
 # Install udev rules granting unprivileged USB access to rpiboot/fastboot
 # devices. Without these a non-root user cannot open the device and it
@@ -16,6 +16,6 @@ src/linux/99-rpiboot.rules /usr/lib/udev/rules.d/
 src/linux/icon/vbase-imager.svg /usr/share/icons/hicolor/scalable/apps/
 
 debian/vbase-imager.desktop /usr/share/applications/
-debian/com.onecomet.vbase-imager.metainfo.xml /usr/share/metainfo/
+debian/nz.co.onecomet.vbase-imager.metainfo.xml /usr/share/metainfo/
 debian/vbase-imager-manifest.xml /usr/share/mime/packages/
 

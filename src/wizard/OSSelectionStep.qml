@@ -21,7 +21,7 @@ WizardStepBase {
     readonly property OSListModel osmodel: ImageWriterSingleton.getOSList()
     
     title: qsTr("Choose a vBase release")
-    subtitle: qsTr("The installer image for vBase hosts. It's downloaded from github.com/MSNFernando/vbase-releases and checked before anything is written.")
+    subtitle: qsTr("The installer for vBase hosts, from GitHub. It's checked before anything is written.")
     showNextButton: true
     nextButtonText: qsTr("Next: choose the USB stick")
     // Disable Next until a concrete OS has been selected

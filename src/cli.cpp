@@ -27,8 +27,8 @@ Cli::Cli(int &argc, char *argv[]) : QObject(nullptr), _imageWriter(nullptr)
     /* Attach to console for output (Windows-specific, no-op on other platforms) */
     PlatformQuirks::attachConsole();
     _app = new QCoreApplication(argc, argv);
-    _app->setOrganizationName("vBase");
-    _app->setOrganizationDomain("github.com/MSNFernando");
+    _app->setOrganizationName("ONECOMET");
+    _app->setOrganizationDomain("onecomet.co.nz");
     _app->setApplicationName("vBase Imager");
     _app->setApplicationVersion(ImageWriter::staticVersion());
     // Don't create ImageWriter here - defer until we know we need it

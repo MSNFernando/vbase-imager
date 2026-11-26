@@ -19,7 +19,7 @@ clean:
 prune-build-tree:
 	rm -rf debian/vbase-imager debian/vbase-imager-cli debian/vbase-imager-embedded \
 		debian/vbase-imager-amd64 debian/.debhelper debian/tmp \
-		debian/com.onecomet.vbase-imager.metainfo.xml
+		debian/nz.co.onecomet.vbase-imager.metainfo.xml
 	rm -f debian/files debian/*.substvars debian/*.debhelper.log \
 		debian/debhelper-build-stamp debian/*debhelper*
 	rm -rf build build-* obj-*
@@ -58,8 +58,8 @@ ifneq (,$(filter vbase-imager,$(PACKAGES)))
 		-DGIT_EXECUTABLE=$$(command -v git) \
 		-P $(GENERATE_VERSION)
 	cmake -DVERSION_VARS_FILE=$(VERSION_DIR)/imager_version_vars.cmake \
-		-DINPUT=$(CURDIR)/debian/com.onecomet.vbase-imager.metainfo.xml.in \
-		-DOUTPUT=$(CURDIR)/debian/com.onecomet.vbase-imager.metainfo.xml \
+		-DINPUT=$(CURDIR)/debian/nz.co.onecomet.vbase-imager.metainfo.xml.in \
+		-DOUTPUT=$(CURDIR)/debian/nz.co.onecomet.vbase-imager.metainfo.xml \
 		-P $(CONFIGURE_VERSIONED)
 	$(STAGE_APPIMAGES) desktop
 endif

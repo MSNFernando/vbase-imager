@@ -1425,7 +1425,7 @@ TEST_CASE("A policy filename is stable, unique and stays in its directory",
     // Two AppImages in different places do not share one.
     CHECK(nameA != QString::fromLatin1(b));
 
-    CHECK(nameA.startsWith(QStringLiteral("com.onecomet.vbase-imager.appimage-")));
+    CHECK(nameA.startsWith(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-")));
     CHECK(nameA.endsWith(QStringLiteral(".policy")));
 
     // It is joined onto a directory, so anything that looks like a path
@@ -1721,7 +1721,7 @@ TEST_CASE("A policy filename cannot escape the actions directory",
         INFO("name: " << name.toStdString());
         CHECK_FALSE(name.contains(QLatin1Char('/')));
         CHECK_FALSE(name.contains(QStringLiteral("..")));
-        CHECK(name.startsWith(QStringLiteral("com.onecomet.vbase-imager.appimage-")));
+        CHECK(name.startsWith(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-")));
         CHECK(name.endsWith(QStringLiteral(".policy")));
     }
 }
@@ -3591,7 +3591,7 @@ QByteArray policyGranting(const QString& execPath)
     return QStringLiteral(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         "<policyconfig>\n"
-        "  <action id=\"com.onecomet.vbase-imager.pkexec.run\">\n"
+        "  <action id=\"nz.co.onecomet.vbase-imager.pkexec.run\">\n"
         "    <message>Authentication is required to write to a disk</message>\n"
         "    <defaults><allow_any>auth_admin</allow_any></defaults>\n"
         "    <annotate key=\"org.freedesktop.policykit.exec.path\">%1</annotate>\n"
@@ -3675,7 +3675,7 @@ TEST_CASE("A policy naming this binary is found", "[platformquirks][policy]")
     REQUIRE(etc.isValid());
     REQUIRE(usr.isValid());
     REQUIRE(writePolicyFile(etc.path() + QStringLiteral("/actions"),
-                            QStringLiteral("com.onecomet.vbase-imager.appimage-abc.policy"),
+                            QStringLiteral("nz.co.onecomet.vbase-imager.appimage-abc.policy"),
                             policyGranting(bundle)));
 
     CHECK(policyInstalledWith(etc.path(), usr.path()) == 1);
@@ -3697,7 +3697,7 @@ TEST_CASE("The vendor directory is searched too", "[platformquirks][policy]")
     REQUIRE(usr.isValid());
     REQUIRE(QDir().mkpath(etc.path() + QStringLiteral("/actions")));
     REQUIRE(writePolicyFile(usr.path(),
-                            QStringLiteral("com.onecomet.vbase-imager.appimage-def.policy"),
+                            QStringLiteral("nz.co.onecomet.vbase-imager.appimage-def.policy"),
                             policyGranting(bundle)));
 
     CHECK(policyInstalledWith(etc.path(), usr.path()) == 1);
@@ -3716,7 +3716,7 @@ TEST_CASE("Another AppImage's policy is not taken for ours",
     REQUIRE(etc.isValid());
     REQUIRE(usr.isValid());
     REQUIRE(writePolicyFile(etc.path() + QStringLiteral("/actions"),
-                            QStringLiteral("com.onecomet.vbase-imager.appimage-old.policy"),
+                            QStringLiteral("nz.co.onecomet.vbase-imager.appimage-old.policy"),
                             policyGranting(QStringLiteral("/opt/elsewhere/vbase-imager.AppImage"))));
 
     CHECK(policyInstalledWith(etc.path(), usr.path()) == 0);
@@ -4004,7 +4004,7 @@ TEST_CASE("Installing a policy writes one naming this binary, and it is then fou
     const QStringList written = policyFilesIn(actions);
     REQUIRE(written.size() == 1);
     CHECK(written.first().startsWith(
-        QStringLiteral("com.onecomet.vbase-imager.appimage-")));
+        QStringLiteral("nz.co.onecomet.vbase-imager.appimage-")));
 
     // And the round trip: what was written is what the check reads back.
     const QString check = runProbeInPolkitNamespace(QStringLiteral("policy"),
@@ -4026,7 +4026,7 @@ TEST_CASE("Installing sweeps away a policy for a binary that is gone",
     REQUIRE(usr.isValid());
     const QString actions = etc.path() + QStringLiteral("/actions");
     REQUIRE(writePolicyFile(actions,
-                            QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy"),
+                            QStringLiteral("nz.co.onecomet.vbase-imager.appimage-gone.policy"),
                             policyGranting(QStringLiteral("/opt/deleted-appimage/vbase-imager.AppImage"))));
 
     runProbeInPolkitNamespace(QStringLiteral("install"), etc.path(), usr.path());
@@ -4034,7 +4034,7 @@ TEST_CASE("Installing sweeps away a policy for a binary that is gone",
     const QStringList left = policyFilesIn(actions);
     INFO(left.join(QStringLiteral(", ")).toStdString());
     CHECK_FALSE(left.contains(
-        QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy")));
+        QStringLiteral("nz.co.onecomet.vbase-imager.appimage-gone.policy")));
 }
 
 TEST_CASE("Installing leaves alone a policy for a binary that is still there",
@@ -4051,7 +4051,7 @@ TEST_CASE("Installing leaves alone a policy for a binary that is still there",
     const QString actions = etc.path() + QStringLiteral("/actions");
     // /bin/sh stands in for the other copy: a path that certainly exists.
     REQUIRE(writePolicyFile(actions,
-                            QStringLiteral("com.onecomet.vbase-imager.appimage-other.policy"),
+                            QStringLiteral("nz.co.onecomet.vbase-imager.appimage-other.policy"),
                             policyGranting(QStringLiteral("/bin/sh"))));
 
     runProbeInPolkitNamespace(QStringLiteral("install"), etc.path(), usr.path());
@@ -4059,7 +4059,7 @@ TEST_CASE("Installing leaves alone a policy for a binary that is still there",
     const QStringList left = policyFilesIn(actions);
     INFO(left.join(QStringLiteral(", ")).toStdString());
     CHECK(left.contains(
-        QStringLiteral("com.onecomet.vbase-imager.appimage-other.policy")));
+        QStringLiteral("nz.co.onecomet.vbase-imager.appimage-other.policy")));
 }
 
 TEST_CASE("Installing does not touch somebody else's policy",
@@ -5739,15 +5739,15 @@ TEST_CASE("Stale policies are cleared out, and the ones in use are left alone",
     };
 
     // Five shapes, one per arm of the sweep.
-    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-notag.policy"),
+    policy(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-notag.policy"),
            QStringLiteral("<action id=\"x\"><annotate key=\"other\">v</annotate></action>"));
-    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-unclosed.policy"),
+    policy(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-unclosed.policy"),
            QStringLiteral("<annotate key=\"") + tag + QStringLiteral("/some/path"));
-    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-empty.policy"),
+    policy(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-empty.policy"),
            QStringLiteral("<annotate key=\"") + tag + QStringLiteral("</annotate>"));
-    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-current.policy"),
+    policy(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-current.policy"),
            QStringLiteral("<annotate key=\"") + tag + self + QStringLiteral("</annotate>"));
-    policy(QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy"),
+    policy(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-gone.policy"),
            QStringLiteral("<annotate key=\"") + tag
                + QStringLiteral("/nonexistent/vbase-imager.AppImage</annotate>"));
 
@@ -5768,16 +5768,16 @@ TEST_CASE("Stale policies are cleared out, and the ones in use are left alone",
     };
 
     // Gone: it named a binary that is not there any more.
-    CHECK_FALSE(present(QStringLiteral("com.onecomet.vbase-imager.appimage-gone.policy")));
+    CHECK_FALSE(present(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-gone.policy")));
 
     // Kept: this one is the copy running now.
-    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-current.policy")));
+    CHECK(present(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-current.policy")));
 
     // Kept, because the sweep could not read a path out of them -- removing
     // a file it does not understand is not its business.
-    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-notag.policy")));
-    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-unclosed.policy")));
-    CHECK(present(QStringLiteral("com.onecomet.vbase-imager.appimage-empty.policy")));
+    CHECK(present(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-notag.policy")));
+    CHECK(present(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-unclosed.policy")));
+    CHECK(present(QStringLiteral("nz.co.onecomet.vbase-imager.appimage-empty.policy")));
 
     // Kept, and not ours to touch.
     CHECK(present(QStringLiteral("org.example.something-else.policy")));

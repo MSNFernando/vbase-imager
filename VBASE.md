@@ -76,8 +76,8 @@ plus Windows and macOS jobs. All unsigned; artifacts are attached to the run
 The program is `vbase-imager` (`vbase-imager.exe`, `vBase Imager.app`,
 `vbase-imager-<version>-desktop-x86_64.AppImage`). Linux installs
 `vbase-imager.desktop`, the `vbase-imager` icon, AppStream id and polkit
-actions under `com.onecomet.vbase-imager`; the macOS bundle id and D-Bus name
-are `com.onecomet.vbase-imager`; the callback URL scheme is `vbase-imager://`.
+actions under `nz.co.onecomet.vbase-imager`; the macOS bundle id and D-Bus name
+are `nz.co.onecomet.vbase-imager`; the callback URL scheme is `vbase-imager://`.
 Settings and caches live under organisation "ONECOMET", app "vBase Imager", so
 nothing is shared with Raspberry Pi Imager. Internal source, class and
 translation-catalogue names (`imagewriter.cpp`, `i18n/rpi-imager_*.ts`) keep

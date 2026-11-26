@@ -11,7 +11,7 @@ else()
     # Set all required bundle properties
     set(MACOSX_BUNDLE_BUNDLE_NAME "${APP_NAME}")
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.onecomet.vbase-imager")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "nz.co.onecomet.vbase-imager")
     set(MACOSX_BUNDLE_ICON_FILE "AppIcon")
     string(TIMESTAMP CURRENT_YEAR "%Y")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2020-${CURRENT_YEAR} Raspberry Pi Ltd")

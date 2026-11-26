@@ -4,7 +4,7 @@
 #   mode          jump, or write for a page that only exists during a real write
 #   published-as  basename this page is published under, or - if it is not
 #
-# The published names are the ones debian/com.onecomet.vbase-imager.metainfo.xml.in
+# The published names are the ones debian/nz.co.onecomet.vbase-imager.metainfo.xml.in
 # points at under downloads.raspberrypi.org/imager/.
 #
 # page                     mode   published-as

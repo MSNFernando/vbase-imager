@@ -7,7 +7,7 @@
   <vendor>vBase</vendor>
   <vendor_url>https://github.com/MSNFernando/vbase-imager</vendor_url>
 
-  <action id="com.onecomet.vbase-imager.run">
+  <action id="nz.co.onecomet.vbase-imager.run">
     <description>Run vBase Imager</description>
     <message>Authentication is required to run vBase Imager</message>
     <icon_name>vbase-imager</icon_name>
