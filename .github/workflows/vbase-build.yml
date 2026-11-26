@@ -1,10 +1,14 @@
 # vBase Imager builds.
 #
-#   push to vbase          Linux only: a quick check that it still builds
+#   push to vbase          Linux only (x86_64 and ARM64): a quick check that it still builds
 #   pull request / by hand Linux, Windows and macOS
-#   tag vbase-v*           all three, the Windows build signed through SignPath (once set
+#   tag vbase-v*           everything, the Windows builds signed through SignPath (once set
 #                          up; each request approved by hand there), and a draft GitHub
 #                          release with the downloads and their SHA-256 sums
+#
+# Downloads: Linux AppImages for x86_64 and ARM64; Windows x64 as one self-contained exe and a zip
+# (Windows 11 on ARM runs it through its x64 emulation: Qt for Windows ARM64 is MSVC-only,
+# and this project builds with MinGW); a universal macOS DMG (Intel and Apple Silicon).
 #
 # The plain v* tags in this repository are upstream's and build nothing. Signing uses
 # SignPath Foundation's certificate: see CODE_SIGNING_POLICY.md.
@@ -35,8 +39,14 @@ env:
 
 jobs:
   linux:
-    name: Linux AppImage (x86_64)
-    runs-on: ubuntu-22.04
+    name: Linux AppImage (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: x86_64,  runner: ubuntu-22.04,     qt_host: linux,       qt_arch: linux_gcc_64 }
+          - { arch: aarch64, runner: ubuntu-22.04-arm, qt_host: linux_arm64, qt_arch: linux_gcc_arm64 }
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,22 +67,22 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          host: linux
+          host: ${{ matrix.qt_host }}
           target: desktop
-          arch: linux_gcc_64
+          arch: ${{ matrix.qt_arch }}
           cache: true
 
       - name: Build AppImage
-        run: ./create-appimage.sh --arch=x86_64 --qt-root="$QT_ROOT_DIR"
+        run: ./create-appimage.sh --arch=${{ matrix.arch }} --qt-root="$QT_ROOT_DIR"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vbase-imager-linux-x86_64
-          path: vbase-imager-*-desktop-x86_64.AppImage
+          name: vbase-imager-linux-${{ matrix.arch }}
+          path: vbase-imager-*-desktop-${{ matrix.arch }}.AppImage
           if-no-files-found: error
 
   windows:
-    name: Windows x64 (zip)
+    name: Windows x64 (self-contained exe and zip)
     # not for ordinary pushes (Linux checks those)
     if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/vbase-v')
     runs-on: windows-2022
@@ -143,6 +153,80 @@ jobs:
           path: signed/
           if-no-files-found: error
 
+      # The self-contained exe packs build/deploy: once the programs are signed, the signed
+      # copies go in, so what it runs is signed too
+      - name: Use the signed programs
+        if: steps.sign.outcome == 'success'
+        run: cp -f signed/*.exe build/deploy/
+
+      # One vbase-imager.exe that needs no installing: 7-Zip's 7zSD.sfx module with the app
+      # in a 7z archive behind it. Run, it unpacks to a temporary folder, starts the app and
+      # deletes the folder when the app closes. The stub asks for administrator rights itself
+      # (the app needs them to write a drive, and the module starts it with CreateProcess,
+      # which can't elevate), and carries vBase Imager's icon and version details.
+      - name: Build the self-contained exe
+        env:
+          LZMA_SDK_URL: https://github.com/ip7z/7zip/releases/download/26.06/lzma2606.7z
+          LZMA_SDK_SHA256: 1d9da340870b12712e9068be178a4436fbad785486b62aed6e2aa88ea1e3bb65
+          RCEDIT_URL: https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
+          RCEDIT_SHA256: 3e7801db1a5edbec91b49a24a094aad776cb4515488ea5a4ca2289c400eade2a
+        run: |
+          set -euo pipefail
+          mkdir -p sfx portable
+          curl -fsSL -o sfx/lzma.7z "$LZMA_SDK_URL"
+          echo "$LZMA_SDK_SHA256  sfx/lzma.7z" | sha256sum -c -
+          curl -fsSL -o sfx/rcedit.exe "$RCEDIT_URL"
+          echo "$RCEDIT_SHA256  sfx/rcedit.exe" | sha256sum -c -
+          7z e -y -osfx sfx/lzma.7z bin/7zSD.sfx > /dev/null
+
+          VERSION="$(git describe --tags --dirty --match 'vbase-v[0-9]*' 2>/dev/null | sed 's/^vbase-v//')"
+          [ -n "$VERSION" ] || VERSION="1.0.0-dev-g$(git rev-parse --short HEAD)"
+          NUMERIC="$(echo "$VERSION" | sed -n 's/^\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p')"
+          ./sfx/rcedit.exe sfx/7zSD.sfx \
+            --set-icon src/icons/vbase-imager.ico \
+            --set-requested-execution-level requireAdministrator \
+            --set-file-version "${NUMERIC:-0.0.0}.0" --set-product-version "$VERSION" \
+            --set-version-string ProductName "vBase Imager" \
+            --set-version-string FileDescription "vBase Imager" \
+            --set-version-string CompanyName "ONECOMET" \
+            --set-version-string LegalCopyright "Apache-2.0; based on Raspberry Pi Imager by Raspberry Pi Ltd" \
+            --set-version-string OriginalFilename "vbase-imager.exe"
+
+          printf '%s\r\n' ';!@Install@!UTF-8!' 'Title="vBase Imager"' 'RunProgram="vbase-imager.exe"' ';!@InstallEnd@!' > sfx/config.txt
+          (cd build/deploy && 7z a -t7z -m0=lzma2 -mx=9 -bd "$GITHUB_WORKSPACE/sfx/app.7z" . > /dev/null)
+          cat sfx/7zSD.sfx sfx/config.txt sfx/app.7z > portable/vbase-imager.exe
+          7z t portable/vbase-imager.exe | tail -3
+          ls -l portable/
+
+      - uses: actions/upload-artifact@v4
+        id: portable
+        with:
+          name: vbase-imager-windows-x64-exe
+          path: portable/vbase-imager.exe
+          if-no-files-found: error
+
+      - name: Sign the exe with SignPath
+        id: sign-portable
+        if: steps.sign.outcome == 'success'
+        uses: signpath/github-action-submit-signing-request@v3.2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG || 'vbase-imager' }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG || 'release-signing' }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_EXE_CONFIGURATION_SLUG || 'exe' }}
+          github-artifact-id: ${{ steps.portable.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed-exe/
+
+      - uses: actions/upload-artifact@v4
+        if: steps.sign-portable.outcome == 'success'
+        with:
+          name: vbase-imager-windows-x64-exe-signed
+          path: signed-exe/
+          if-no-files-found: error
+
   macos:
     name: macOS universal (unsigned DMG)
     # not for ordinary pushes (Linux checks those)
@@ -201,7 +285,13 @@ jobs:
           set -euo pipefail
           VERSION="${TAG#vbase-v}"
           mkdir out
-          cp dist/vbase-imager-linux-x86_64/*.AppImage out/
+          cp dist/vbase-imager-linux-x86_64/*.AppImage "out/vbase-imager-$VERSION-linux-x86_64.AppImage"
+          cp dist/vbase-imager-linux-aarch64/*.AppImage "out/vbase-imager-$VERSION-linux-arm64.AppImage"
+          if [ -d dist/vbase-imager-windows-x64-exe-signed ]; then
+            cp dist/vbase-imager-windows-x64-exe-signed/vbase-imager.exe "out/vbase-imager-$VERSION-windows-x64.exe"
+          else
+            cp dist/vbase-imager-windows-x64-exe/vbase-imager.exe "out/vbase-imager-$VERSION-windows-x64-unsigned.exe"
+          fi
           if [ -d dist/vbase-imager-windows-x64-signed ]; then
             WINDOWS="Windows: signed by SignPath Foundation (free code signing provided by SignPath.io, certificate by SignPath Foundation)."
             (cd dist/vbase-imager-windows-x64-signed && zip -qr "$GITHUB_WORKSPACE/out/vbase-imager-$VERSION-windows-x64.zip" .)
@@ -214,9 +304,10 @@ jobs:
           cat > notes.md <<NOTES
           Writes the USB stick a vBase server boots from: choose a release, choose a stick of 32 GB or more, and it downloads, checks, writes and verifies it.
 
-          - Linux: x86_64 AppImage
+          - Windows: the .exe is all of vBase Imager in one file, with nothing to install: run it and it asks for administrator rights, then starts. The zip is the same app unpacked. Both are x64; Windows 11 on ARM runs them too.
           - $WINDOWS
-          - macOS: universal DMG, not signed yet, so Gatekeeper warns when it's opened.
+          - Linux: AppImages for x86_64 and ARM64.
+          - macOS: universal DMG (Intel and Apple Silicon), not signed yet, so Gatekeeper warns when it's opened.
 
           Check a download: \`sha256sum -c SHA256SUMS --ignore-missing\`
           NOTES

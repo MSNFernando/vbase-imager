@@ -95,11 +95,9 @@ Root: HKLM; Subkey: "Software\Classes\VBASE_IMAGER_MANIFEST\shell\open\command";
 ; No URL protocol handler: upstream's exists for Raspberry Pi Connect sign-in, which vBase doesn't use
 
 [Files]
-; WinUSB driver for Raspberry Pi USB boot mode devices (rpiboot).
-; For signed builds the INF has CatalogFile= uncommented and the matching
-; signed .cat is included; for unsigned builds only the bare INF is present.
-Source: "@CMAKE_BINARY_DIR@\deploy\rpiboot-winusb.inf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "@CMAKE_BINARY_DIR@\deploy\rpiboot-winusb.cat"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+; vBase Imager: no WinUSB driver for Raspberry Pi USB boot (rpiboot) is installed. vBase
+; never uses Pi USB boot, and a system-wide driver shouldn't be added for nothing. The
+; uninstaller still removes one if an earlier install left it.
 
 ; Main program files
 Source: "@CMAKE_BINARY_DIR@\deploy\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion signonce
@@ -135,10 +133,6 @@ Name: "{group}\{cm:ProgramName}"; Filename: "{app}\{#MyAppExeName}"; AfterInstal
 Name: "{commondesktop}\{cm:ProgramName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AfterInstall: SetElevationBit('{commondesktop}\{cm:ProgramName}.lnk')
 
 [Run]
-; Stage and install WinUSB driver for Raspberry Pi USB boot mode devices.
-; pnputil /install also applies the driver to any currently-connected device.
-; Return code 3010 means success-with-reboot-required and is treated as success.
-Filename: "{sys}\pnputil.exe"; Parameters: "/add-driver ""{app}\rpiboot-winusb.inf"" /install"; Flags: runhidden waituntilterminated; StatusMsg: "Installing USB driver..."
 
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 

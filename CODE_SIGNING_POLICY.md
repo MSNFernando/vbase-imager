@@ -14,9 +14,10 @@ certificate, so Windows shows **SignPath Foundation** as the publisher.
 - Only releases: a vBase release tag (`vbase-v*`), or a run started by hand with *sign* chosen. Ordinary
   pushes are built unsigned.
 - Every signing request is approved by hand in SignPath before it's signed.
-- Signed: vBase Imager's own programs (`vbase-imager.exe` and the other `.exe` and `.dll`
-  files built from this source). Libraries from other projects (Qt and the like) keep
-  their publishers' signatures, if they have any.
+- Signed: vBase Imager's own programs (`vbase-imager.exe` and the other `.exe` files built
+  from this source), and then the self-contained `vbase-imager.exe` that packs them (7-Zip's
+  public-domain SFX module with the app's files appended). Libraries from other projects (Qt
+  and the like) keep their publishers' signatures, if they have any.
 
 ## Team
 

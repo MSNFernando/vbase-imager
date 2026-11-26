@@ -29,9 +29,19 @@ run it with `sudo` or let it install an authorisation rule the first time.
 ## Downloads
 
 Download the latest release from
-**[Releases](https://github.com/MSNFernando/vbase-imager/releases/latest)**: Windows (x64,
-zip), macOS (universal DMG) and Linux (x86_64 AppImage), with `SHA256SUMS` to check them
-(`sha256sum -c SHA256SUMS --ignore-missing`).
+**[Releases](https://github.com/MSNFernando/vbase-imager/releases/latest)**, with `SHA256SUMS`
+to check them (`sha256sum -c SHA256SUMS --ignore-missing`):
+
+| Computer | Download |
+|---|---|
+| Windows (x64; Windows 11 on ARM runs it too) | **`vbase-imager-<version>-windows-x64.exe`**: everything in one file, nothing to install. Run it, allow administrator rights, and it starts. (It unpacks itself to a temporary folder, which is deleted when it closes.) Or the `.zip` of the same app, unpacked. |
+| macOS (Intel and Apple Silicon) | `vbase-imager-<version>-macos.dmg` |
+| Linux x86_64 | `vbase-imager-<version>-linux-x86_64.AppImage` |
+| Linux ARM64 | `vbase-imager-<version>-linux-arm64.AppImage` |
+
+There's no native Windows ARM64 build yet: Qt's Windows ARM64 build needs Microsoft's
+compiler, and this project builds with MinGW. Windows 11 on ARM runs the x64 build through its
+built-in emulation.
 
 Builds aren't signed yet, so Windows SmartScreen and macOS Gatekeeper warn when they're
 opened. Windows builds will be signed through SignPath Foundation (see
@@ -106,8 +116,9 @@ list's format.
 The version comes from tags named `vbase-vX.Y.Z` (for example `vbase-v1.0.0`); untagged
 builds show `X.Y.Z-dev-g<commit>`. The plain `v*` tags in this repository are upstream's.
 
-Pushing a `vbase-v*` tag builds all three platforms and, once SignPath is set up, sends the
-Windows build to be signed.
+Pushing a `vbase-v*` tag builds everything, sends the Windows build to be signed (once
+SignPath is set up), and drafts a release with the downloads and `SHA256SUMS`: check it, then
+publish it. Pushes to `vbase` build only the Linux AppImages, as a quick check.
 
 ## Code signing
 
@@ -123,8 +134,9 @@ privacy statement.
 Setting it up (repository owner): once SignPath approves the project, add the secret
 `SIGNPATH_API_TOKEN` and the variable `SIGNPATH_ORGANIZATION_ID` to this repository
 (`gh secret set` / `gh variable set`). The project slug defaults to `vbase-imager` and the
-signing policy to `release-signing`; the proposed artifact configuration is in
-[`.signpath/`](.signpath/artifact-configuration.xml).
+signing policy to `release-signing`. A release sends two requests: the programs in the zip
+(artifact configuration `default`), then the self-contained `.exe` built from them (`exe`).
+Both proposed configurations are in [`.signpath/`](.signpath/).
 
 ## Licence and credits
 
