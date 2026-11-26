@@ -28,10 +28,10 @@ run it with `sudo` or let it install an authorisation rule the first time.
 
 ## Downloads
 
-Builds for **Windows** (x64, zip), **macOS** (universal DMG) and **Linux** (x86_64 AppImage)
-are made by GitHub Actions on every push to the `vbase` branch. They're attached to each
-[workflow run](https://github.com/MSNFernando/vbase-imager/actions) until releases are
-published.
+Download the latest release from
+**[Releases](https://github.com/MSNFernando/vbase-imager/releases/latest)**: Windows (x64,
+zip), macOS (universal DMG) and Linux (x86_64 AppImage), with `SHA256SUMS` to check them
+(`sha256sum -c SHA256SUMS --ignore-missing`).
 
 Builds aren't signed yet, so Windows SmartScreen and macOS Gatekeeper warn when they're
 opened. Windows builds will be signed through SignPath Foundation (see
